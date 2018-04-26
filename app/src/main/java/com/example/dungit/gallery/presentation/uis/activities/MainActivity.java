@@ -3,6 +3,7 @@ package com.example.dungit.gallery.presentation.uis.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -12,11 +13,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -80,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+ //       getSupportActionBar().hide();
+//        toolbarTop = findViewById(R.id.tb_top);
+//        setSupportActionBar(toolbarTop);
         isCheckedChangeView = false;
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -196,8 +201,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        toolbarTop = findViewById(R.id.tb_top);
-        toolbarTop.inflateMenu(R.menu.main);
+        toolbarTop =findViewById(R.id.tb_top);
+        setSupportActionBar(toolbarTop);
 
         lstFragment = new ArrayList<>();
 
@@ -217,33 +222,36 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(myViewPagerAdapter);
+    }
 
-        toolbarTop.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.act_change_view:
-                        isCheckedChangeView = !isCheckedChangeView;
-                       // ft = getFragmentManager().beginTransaction().repl
-                        if(isCheckedChangeView) {
-                            item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
-                            pictureFragment.onChangeView(EMODE.MODE_GRID);
-                        }
-                        else{
-                            item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
-                            pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_change_view:
+                isCheckedChangeView = !isCheckedChangeView;
+                // ft = getFragmentManager().beginTransaction().repl
+                if (isCheckedChangeView) {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_GRID);
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
 
-                        }
-                        break;
-                    case R.id.act_settings:
-                        break;
-                    case R.id.act_about:
-                        break;
                 }
-                return true;
-            }
-        });
+                break;
+            case R.id.act_settings:
+                break;
+            case R.id.act_about:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main,menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
