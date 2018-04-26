@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -20,14 +21,23 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.dungit.gallery.R;
+import com.example.dungit.gallery.presentation.Utils.EmptyFolderFileFilter;
+import com.example.dungit.gallery.presentation.databasehelper.AlbumDatabaseHelper;
+import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.EMODE;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.MyViewPagerAdapter;
+import com.example.dungit.gallery.presentation.uis.fragments.AlbumFragment;
 import com.example.dungit.gallery.presentation.uis.fragments.PictureFragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity {
     private static final String KEY_PICTURE_BY_DATE = "PICTURE_BY_DATE";
@@ -38,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Fragment> lstFragment;
     private TabLayout tabLayout;
     private PictureFragment pictureFragment;
+    private AlbumFragment albumFragment;
     private Toolbar toolbarTop;
     private FragmentTransaction ft;
 
@@ -46,15 +57,22 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ListPhotoSameDate> lstPhotoByDate = new ArrayList<>();
     private ArrayList<Photo> arrListPhoto = new ArrayList<>();
 
+    private LinkedList<Album> listAlbum = new LinkedList<>();
+    private LinkedList<Album> listHiddenAlbum = new LinkedList<>();
+    private static final String USER_ALBUM_FLODER
+            = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Albums06/";
+
 
     private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     private static final String ID = MediaStore.Images.ImageColumns._ID;
     private static final String DATE_TAKEN = MediaStore.Images.ImageColumns.DATE_TAKEN;
     private static final String BUCKET_ID = MediaStore.Images.Media.BUCKET_ID;
     private static final String BUCKET_NAME = MediaStore.Images.Media.BUCKET_DISPLAY_NAME;
+
+    private static final String DATA = MediaStore.Images.Media.DATA;
     private static final String[] IMAGE_PROJECTION_ALBUM =
             new String[]{
-                    ID, DATE_TAKEN, BUCKET_NAME, BUCKET_ID
+                    ID, DATE_TAKEN, BUCKET_NAME, BUCKET_ID,DATA
             };
     private ViewPager viewPager;
 
@@ -109,9 +127,14 @@ public class MainActivity extends AppCompatActivity {
         final int dateIndex = imgCursor.getColumnIndex(DATE_TAKEN);
         final int albumNameIndex = imgCursor.getColumnIndex(BUCKET_NAME);
         final int albumIdIndex = imgCursor.getColumnIndex(BUCKET_ID);
+        final int dataIndex = imgCursor.getColumnIndex(DATA);
 
         ListPhotoSameDate lstPhoto = null;
         String date = null;
+
+
+
+        HashMap<Long, LinkedList<Photo>> albumMap = new HashMap<>();
 
         while (imgCursor.moveToNext()) {
             final long id = imgCursor.getLong(idIndex);
@@ -119,11 +142,13 @@ public class MainActivity extends AppCompatActivity {
             final String albumName = imgCursor.getString(albumNameIndex);
             final long albumId = imgCursor.getLong(albumIdIndex);
 
+            final String filePath = imgCursor.getString(dataIndex);
+
             date = new Date(dateTaken).toString();
             date = date.substring(date.indexOf(" ") + 1, date.indexOf(" ") + 7) + " "
                     + date.substring(date.lastIndexOf(" ") + 1);
 
-            Photo curPhoto = new Photo(id, date, albumId, albumName);
+            Photo curPhoto = new Photo(id, date, albumId, albumName,new File(filePath));
             arrListPhoto.add(curPhoto);
 
             if (lstPhoto == null) {
@@ -139,11 +164,17 @@ public class MainActivity extends AppCompatActivity {
                     lstPhotoByDate.add(lstPhoto);
                 }
             }
+            if (albumMap.containsKey(albumId)) {
+                albumMap.get(albumId).add(curPhoto);
+            } else {
+                LinkedList<Photo> photos = new LinkedList<>();
+                photos.add(curPhoto);
+                albumMap.put(albumId, photos);
+            }
 
         }
         imgCursor.close();
-
-
+        loadAlbums(albumMap);
     }
 
     @Override
@@ -165,16 +196,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-
         toolbarTop = findViewById(R.id.tb_top);
         toolbarTop.inflateMenu(R.menu.main);
 
         lstFragment = new ArrayList<>();
 
         pictureFragment = PictureFragment.newInstance(lstPhotoByDate);
+        albumFragment = AlbumFragment.newInstance(MainActivity.this,listAlbum,listHiddenAlbum);
         lstFragment.add(pictureFragment);
-        //lstFragment.add(pictureGridFragment);
-        lstFragment.add(PictureFragment.newInstance(lstPhotoByDate));
+        lstFragment.add(albumFragment);
         lstFragment.add(PictureFragment.newInstance(lstPhotoByDate));
 
         viewPager = findViewById(R.id.viewpager);
@@ -218,6 +248,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
+
         if (viewPager.getCurrentItem() == 0) {
             super.onBackPressed();
         } else {
@@ -225,4 +257,58 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    void loadAlbums(HashMap<Long, LinkedList<Photo>> albumMap){
+        Iterator<Long> it = albumMap.keySet().iterator();
+        AlbumDatabaseHelper databaseHelper = new AlbumDatabaseHelper(this);
+        HashMap<Long,String> albumNames = databaseHelper.getAlbumNamesMap();
+        HashSet<Long> hideids  = databaseHelper.getHideBucketId();
+        while (it.hasNext()) {
+            long id = it.next();
+            LinkedList<Photo> imgs = albumMap.get(id);
+            String name= albumNames.get(id);
+            if(name == null || name.isEmpty()){
+                name = imgs.get(0).getAlbumName();
+            }
+            Album album = new Album(id,name);
+            album.setFile(imgs.get(0).getFile().getParentFile());
+            album.setPhotos(imgs);
+            if(hideids.contains(Long.valueOf(id))){
+                listHiddenAlbum.add(album);
+            }else{
+                listAlbum.add(album);
+            }
+        }
+        scanUserAlbums(albumNames,hideids);
+    }
+
+    void scanUserAlbums(HashMap<Long,String> albumNames,HashSet<Long> hideids){
+        File albumFile = new File(USER_ALBUM_FLODER);
+        File[] files =albumFile.listFiles(new EmptyFolderFileFilter());
+        if(files == null) return;
+        for (File file:files) {
+            long id=file.getAbsolutePath().hashCode();
+
+            String name= albumNames.get(id);
+            if(name == null || name.isEmpty()){
+                name = file.getName();
+            }
+            Album album=new Album(id,name);
+            album.setFile(file);
+            if(hideids.contains(Long.valueOf(id))){
+                listHiddenAlbum.add(album);
+            }else{
+                listAlbum.add(album);
+            }
+        }
+    }
+
+    public Toolbar getToolbarTop(){
+        return toolbarTop;
+    }
+
+    public void onChangeFragmentToPreviewPhoto(String albumName, ArrayList<Photo> lstPhoto){
+
+
+    }
 }

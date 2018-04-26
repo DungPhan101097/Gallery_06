@@ -21,6 +21,9 @@
 
         <activity android:name=".presentation.uis.activities.PreviewPhotoActivity"/>
 
+        <activity android:name=".presentation.uis.controller.ZoomInZoomOut"/>
+
+        <activity android:name=".presentation.uis.activities.PreviewPhotoOfAlbumActivity"/>
 
     </application>
 

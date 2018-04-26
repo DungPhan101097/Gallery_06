@@ -25,7 +25,8 @@ import java.util.ArrayList;
  * Created by DUNGIT on 4/22/2018.
  */
 public class PictureFragment extends Fragment implements PictureFragCallback {
-    private static final String KEY_LIST_PHOTO = "LISTPHOTO";
+    private static final String KEY_LIST_PHOTO = "list_photo";
+    private static final String KEY_MODE = "mode_preview_photo";
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
     private ArrayList<Photo> lstPhoto;
     private EMODE mode;
