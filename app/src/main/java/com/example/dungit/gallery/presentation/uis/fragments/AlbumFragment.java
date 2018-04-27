@@ -63,7 +63,7 @@ public class AlbumFragment extends Fragment {
     private LinkedList<Album> albums;
     private LinkedList<Album> hiddenAlbums;
 
-    private MainActivity main ;
+    private MainActivity main;
     private Album curAlbum;
 
     public AlbumFragment() {
@@ -71,7 +71,7 @@ public class AlbumFragment extends Fragment {
 
     }
 
-    public static AlbumFragment newInstance(Context context,LinkedList<Album> albums,LinkedList<Album> hiddenAlbums) {
+    public static AlbumFragment newInstance(Context context, LinkedList<Album> albums, LinkedList<Album> hiddenAlbums) {
         AlbumFragment fragment = new AlbumFragment();
         fragment.context = context;
         fragment.albums = albums;
@@ -83,9 +83,8 @@ public class AlbumFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        main = (MainActivity)getActivity();
+        main = (MainActivity) getActivity();
     }
-
 
 
     @Override
@@ -93,7 +92,7 @@ public class AlbumFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.album_fragment, container, false);
 
-        MainActivity mainActivity = (MainActivity)context;
+        MainActivity mainActivity = (MainActivity) context;
 
         listAlbum = rootView.findViewById(R.id.listAlbum);
         AlbumAdapter albumAdapter = new AlbumAdapter(context, albums);
@@ -104,7 +103,7 @@ public class AlbumFragment extends Fragment {
         footerV.setOnClickListener(null);
         listAlbum.addFooterView(footerV);
 
-        albumController = new AlbumController(context, albumAdapter,hiddenAlbums);
+        albumController = new AlbumController(context, albumAdapter, hiddenAlbums);
 
         FloatingActionButton fab = rootView.findViewById(R.id.fabAlbum);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +128,6 @@ public class AlbumFragment extends Fragment {
         });
 
 
-
         registerForContextMenu(listAlbum);
 
         return rootView;
@@ -137,7 +135,7 @@ public class AlbumFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.albumSortAZ:
                 albumController.sortAlbums(SortType.NAME_A_Z);
                 break;
@@ -159,7 +157,7 @@ public class AlbumFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.option_menu_album,menu);
+        inflater.inflate(R.menu.option_menu_album, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -182,12 +180,14 @@ public class AlbumFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.albumDelete:
                 albumController.deleteAlbum(album);
+                main.onUpdateListPhotoWhenDelOrHideAlbum(album);
                 break;
             case R.id.albumRename:
                 albumController.renameAlbum(album);
                 break;
             case R.id.albumHide:
                 albumController.hideAlbum(album);
+                main.onUpdateListPhotoWhenDelOrHideAlbum(album);
                 break;
             case R.id.albumMove:
                 albumController.moveAlbum(album);
@@ -198,7 +198,7 @@ public class AlbumFragment extends Fragment {
     }
 
 
-   public static class AlbumExtendSerializable implements Serializable {
+    public static class AlbumExtendSerializable implements Serializable {
         private long id;
         private String name;
         private ArrayList<Photo> photos;
@@ -210,16 +210,16 @@ public class AlbumFragment extends Fragment {
 
         }
 
-       public long getId() {
-           return id;
-       }
+        public long getId() {
+            return id;
+        }
 
-       public String getName() {
-           return name;
-       }
+        public String getName() {
+            return name;
+        }
 
-       public ArrayList<Photo> getPhotos() {
-           return photos;
-       }
-   }
+        public ArrayList<Photo> getPhotos() {
+            return photos;
+        }
+    }
 }

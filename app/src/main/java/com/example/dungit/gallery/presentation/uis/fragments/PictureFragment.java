@@ -33,6 +33,10 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
 
     private MainActivity main;
     private RecyclerView rvWrapper;
+    private AdapterRecyclerView adapterRecyclerView;
+    private AdapterInnerRecyclerView adapterInnerRecyclerView;
+    private LinearLayoutManager linearLayoutManager;
+    private GridLayoutManager gridLayoutManager;
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
         PictureFragment fragment = new PictureFragment();
@@ -52,6 +56,12 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         for (ListPhotoSameDate listPhotoSameDate : lstPhotoSameDate) {
             lstPhoto.addAll(listPhotoSameDate.getLstPhotoHaveSameDate());
         }
+        mode = EMODE.MODE_BY_DATE;
+
+        linearLayoutManager = new LinearLayoutManager(main);
+        gridLayoutManager = new GridLayoutManager(main, 4);
+        adapterRecyclerView = new AdapterRecyclerView(main, lstPhotoSameDate);
+        adapterInnerRecyclerView = new AdapterInnerRecyclerView(main, lstPhoto);
     }
 
     @Override
@@ -61,23 +71,43 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
 
         rvWrapper = view.findViewById(R.id.rv_wrapper);
         rvWrapper.setHasFixedSize(true);
-        rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-        rvWrapper.setAdapter(new AdapterRecyclerView(main, lstPhotoSameDate));
+
+        rvWrapper.setLayoutManager(linearLayoutManager);
+        rvWrapper.setAdapter(adapterRecyclerView);
 
         return view;
     }
 
     @Override
     public void onChangeView(EMODE mode) {
+        this.mode = mode;
         switch (mode) {
             case MODE_BY_DATE:
-                rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-                rvWrapper.setAdapter(new AdapterRecyclerView(main, lstPhotoSameDate));
+                rvWrapper.setLayoutManager(linearLayoutManager);
+                rvWrapper.setAdapter(adapterRecyclerView);
                 break;
             case MODE_GRID:
-                rvWrapper.setLayoutManager(new GridLayoutManager(main, 4));
-                rvWrapper.setAdapter(new AdapterInnerRecyclerView(main, lstPhoto));
+                rvWrapper.setLayoutManager(gridLayoutManager);
+                rvWrapper.setAdapter(adapterInnerRecyclerView);
                 break;
         }
     }
+
+    @Override
+    public void onChangeDataView(ArrayList<ListPhotoSameDate> listPhotoByDate, ArrayList<Photo> lstPhoto) {
+        this.lstPhotoSameDate = listPhotoByDate;
+        this.lstPhoto = lstPhoto;
+        adapterRecyclerView.setData(this.lstPhotoSameDate);
+        adapterInnerRecyclerView.setData(this.lstPhoto);
+
+        switch (mode) {
+            case MODE_BY_DATE:
+                adapterRecyclerView.notifyDataSetChanged();
+                break;
+            case MODE_GRID:
+                adapterInnerRecyclerView.notifyDataSetChanged();
+                break;
+        }
+    }
+
 }

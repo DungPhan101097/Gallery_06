@@ -43,12 +43,17 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
         this.context = context;
     }
 
+    public void setData(ArrayList<Photo> data) {
+        this.data = data;
+    }
+
     @NonNull
     @Override
     public AdapterInnerRecyclerView.InnerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_img_item,
                 parent, false);
         return new InnerViewHolder(view);
+
     }
 
 

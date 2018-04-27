@@ -30,6 +30,10 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         this.context = context;
     }
 
+    public void setData(ArrayList<ListPhotoSameDate> data) {
+        this.data = data;
+    }
+
     @NonNull
     @Override
     public AdapterRecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
