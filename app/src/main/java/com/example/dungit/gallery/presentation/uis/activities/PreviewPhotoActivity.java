@@ -39,7 +39,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
 
         imPreviewPhoto = findViewById(R.id.im_preview_photo);
         imPreviewPhoto.setAdjustViewBounds(false);
