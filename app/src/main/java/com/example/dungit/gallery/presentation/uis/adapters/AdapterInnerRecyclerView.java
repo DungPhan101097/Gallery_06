@@ -69,8 +69,18 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
             @Override
             public void onClick(View view, int position) {
                 Intent intent = new Intent(context, PreviewPhotoActivity.class);
-                PreviewPhotoActivity.setPhotos(data);
-                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,position);
+                int imgPostion = 0;
+                if(context instanceof  MainActivity){
+                    MainActivity mainActivity = (MainActivity) context;
+                    ArrayList<Photo> photos = mainActivity.getArrListPhoto();
+                    PreviewPhotoActivity.setPhotos(photos);
+                    imgPostion=  photos.indexOf(data.get(position));
+                    imgPostion = imgPostion >=0 ? imgPostion : 0;
+                }else{
+                    PreviewPhotoActivity.setPhotos(data);
+                    imgPostion=position;
+                }
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
                 try {
                     context.startActivity(intent);
                 }catch (Exception ex){

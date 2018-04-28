@@ -319,4 +319,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    public ArrayList<Photo> getArrListPhoto() {
+        return arrListPhoto;
+    }
 }
