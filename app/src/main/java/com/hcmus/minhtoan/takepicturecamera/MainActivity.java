@@ -1,5 +1,6 @@
 package com.hcmus.minhtoan.takepicturecamera;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -28,15 +30,15 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int CAMERA_REQUEST=1888;
+    private static final int CAMERA_REQUEST= 1;
+    private static final int PHOTO_SHARE= 2;
 
     ImageView imageView;
     Button btnCamera;
     Button btnShare;
     Button btnSave;
-    Intent shareIntent;
-    String shareBody = "This is a great app!!!";
     AlertDialog dialog;
+    Uri uri;
 
 
     @Override
@@ -73,8 +75,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK){
             if (requestCode == CAMERA_REQUEST){
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                Bundle extras = data.getExtras();
+                Bitmap bitmap = (Bitmap) extras.get("data");
                 imageView.setImageBitmap(bitmap);
+            }
+            if (requestCode == PHOTO_SHARE){
+                uri = data.getData();
+                imageView.setImageURI(uri);
             }
         }
 
@@ -86,13 +93,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (id){
             case R.id.btnCamera:{
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                File picDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmsshhmmss");
-                String date = simpleDateFormat.format(new Date());
-                String name = "IMAGE"+ date+".jpg";
-                File imgageFile = new File(picDir, name);
-                Uri picUri = Uri.fromFile(imgageFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
                 startActivityForResult(intent, CAMERA_REQUEST);
             }
             break;
@@ -124,40 +124,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void startShare(){
         Bitmap bitmap = viewToBitmap(imageView, imageView.getWidth(), imageView.getHeight());
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("image/jpeg");
+
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hhssddmmyy");
+            String date = simpleDateFormat.format(new Date());
+            String name = "IMG-"+date+".jpg";
+            File file = new File(this.getExternalCacheDir(),name);
+            FileOutputStream fOut = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+            file.setReadable(true, false);
+            final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+            intent.setType("image/jpg");
+            startActivity(Intent.createChooser(intent, "Share image via"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void startSave(){
+        ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        Bitmap bitmap = viewToBitmap(imageView, imageView.getWidth(), imageView.getHeight());
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        File file = new File(Environment.getExternalStorageDirectory()+ File.separator+"ImageDemo.jpg");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hhssddmmyy");
+        String date = simpleDateFormat.format(new Date());
+        String name = "IMG-"+date+".jpg";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM + "/Camera/")+ File.separator+ name);
         try {
             file.createNewFile();
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             fileOutputStream.write(byteArrayOutputStream.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///sdcard/ImageDemo.jpg"));
-        startActivity(Intent.createChooser(shareIntent, "Share Image"));
-    }
-    public void startSave(){
-        FileOutputStream fileOutputStream = null;
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yymmdd");
-        String date = simpleDateFormat.format(new Date());
-        String name = "IMG-"+date+".jpg";
-        File newfile = new File(dir, name);
-        try {
-            fileOutputStream = new FileOutputStream(newfile);
-            Bitmap bitmap = viewToBitmap(imageView, imageView.getWidth(), imageView.getHeight());
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
-            fileOutputStream.flush();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        refreshGallery(newfile);
+        refreshGallery(file);
     }
 
     public  void refreshGallery(File file){
