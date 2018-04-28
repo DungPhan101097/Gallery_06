@@ -39,7 +39,7 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity {
             AlbumFragment.AlbumExtendSerializable album =
                     (AlbumFragment.AlbumExtendSerializable) intent.getSerializableExtra(ALBUM_KEY);
             lstPhoto = album.getPhotos();
-            getActionBar().setTitle(album.getName());
+            getSupportActionBar().setTitle(album.getName());
         }
 
         rvWrapperPreviewLstPhoto = findViewById(R.id.rv_wrapper_preview_lst_photo);

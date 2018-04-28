@@ -61,7 +61,8 @@ public class PhotoSlideAdapter  extends PagerAdapter{
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(myImage);
         if(context instanceof PreviewPhotoActivity){
-            toolbar.setTitle(photo.getFile().getName());
+            PreviewPhotoActivity ppa = (PreviewPhotoActivity)context;
+            ppa.getSupportActionBar().setTitle(photo.getFile().getName());
         }
         myImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
