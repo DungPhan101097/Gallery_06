@@ -1,6 +1,8 @@
 package com.example.dungit.gallery.presentation.entities;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -32,6 +34,16 @@ public class Photo implements Serializable {
         this(idImg, dateTaken, albumId, albumName);
         this.file = file;
     }
+
+    protected Photo(Parcel in) {
+        idImg = in.readLong();
+        pathUrl = in.readString();
+        dateTaken = in.readString();
+        albumId = in.readLong();
+        albumName = in.readString();
+    }
+
+
 
     public long getIdImg() {
         return idImg;
@@ -77,4 +89,6 @@ public class Photo implements Serializable {
     public void setFile(File file) {
         this.file = file;
     }
+
+
 }

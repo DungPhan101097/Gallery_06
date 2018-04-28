@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.MyAppGlideModule;
 import com.example.dungit.gallery.presentation.entities.Photo;
+import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import java.util.ArrayList;
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> {
+public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> {
 
     private ArrayList<Photo> data;
     private Context context;
@@ -67,8 +69,14 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
             @Override
             public void onClick(View view, int position) {
                 Intent intent = new Intent(context, PreviewPhotoActivity.class);
-                intent.putExtra(PreviewPhotoActivity.IMG_URL_KEY, curPhoto.getUrl());
-                context.startActivity(intent);
+                PreviewPhotoActivity.setPhotos(data);
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,position);
+                try {
+                    context.startActivity(intent);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
             }
 
             @Override
