@@ -3,6 +3,7 @@ package com.example.dungit.gallery.presentation.uis.activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -12,11 +13,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -39,7 +44,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener{
     private static final String KEY_PICTURE_BY_DATE = "PICTURE_BY_DATE";
     private static final String KEY_PICTURE_GRID = "PICTURE_GRID";
     private static final String KEY_ALBUM = "ALBUM";
@@ -84,7 +89,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+ //       getSupportActionBar().hide();
+//        toolbarTop = findViewById(R.id.tb_top);
+//        setSupportActionBar(toolbarTop);
         isCheckedChangeView = false;
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             date = date.substring(date.indexOf(" ") + 1, date.indexOf(" ") + 7) + " "
                     + date.substring(date.lastIndexOf(" ") + 1);
 
-            Photo curPhoto = new Photo(id, date, albumId, albumName,nameImg,sizeImg,resoluImg,filePath,new File(filePath));
+            Photo curPhoto = new Photo(id, date, albumId, albumName,new File(filePath),nameImg,sizeImg,resoluImg,filePath);
             arrListPhoto.add(curPhoto);
 
             if (lstPhoto == null) {
@@ -206,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        toolbarTop = findViewById(R.id.tb_top);
-        toolbarTop.inflateMenu(R.menu.main);
+        toolbarTop =findViewById(R.id.tb_top);
+        setSupportActionBar(toolbarTop);
 
         lstFragment = new ArrayList<>();
 
@@ -227,36 +234,53 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(myViewPagerAdapter);
+    }
 
-        toolbarTop.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.act_change_view:
-                        isCheckedChangeView = !isCheckedChangeView;
-                       // ft = getFragmentManager().beginTransaction().repl
-                        if(isCheckedChangeView) {
-                            item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
-                            pictureFragment.onChangeView(EMODE.MODE_GRID);
-                        }
-                        else{
-                            item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
-                            pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
-
-                        }
-                        break;
-                    case R.id.act_settings:
-                        break;
-                    case R.id.act_about:
-                        break;
-                    case R.id.act_viewType:
-                        pictureFragment.onChangeViewType();
-                        break;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_change_view:
+                isCheckedChangeView = !isCheckedChangeView;
+                // ft = getFragmentManager().beginTransaction().repl
+                if (isCheckedChangeView) {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_GRID);
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
                 }
-                return true;
-            }
-        });
+                break;
+            case R.id.act_settings:
+                break;
+            case R.id.act_about:
+                break;
+            case R.id.act_viewType:
+                pictureFragment.onChangeViewType();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main,menu);
+        final MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String text = newText;
+        pictureFragment.search(text);
+        return false;
     }
 
     @Override
@@ -323,5 +347,9 @@ public class MainActivity extends AppCompatActivity {
     public void onChangeFragmentToPreviewPhoto(String albumName, ArrayList<Photo> lstPhoto){
 
 
+    }
+
+    public ArrayList<Photo> getArrListPhoto() {
+        return arrListPhoto;
     }
 }

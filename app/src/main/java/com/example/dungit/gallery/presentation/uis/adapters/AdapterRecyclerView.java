@@ -9,6 +9,8 @@ import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.example.dungit.gallery.R;
@@ -21,9 +23,10 @@ import java.util.ArrayList;
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
+public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> implements Filterable {
 
     private ArrayList<ListPhotoSameDate> data;
+    private ArrayList<ListPhotoSameDate> mFilterdata;
     private Context context;
     private AdapterInnerRecyclerView adpInner;
     private ArrayList<ViewHolder> arr_viewholder= new ArrayList<>();
@@ -31,9 +34,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     private  ViewHolder viewholder;
     private static boolean isGrid = true;
 
-
     public AdapterRecyclerView(Context context, ArrayList<ListPhotoSameDate> data) {
         this.data = data;
+        this.mFilterdata =data;
         this.context = context;
     }
 
@@ -49,7 +52,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         viewholder = holder;
         arr_viewholder.add(holder);
-        ListPhotoSameDate curLstPhoto = data.get(position);
+        ListPhotoSameDate curLstPhoto = mFilterdata.get(position);
         holder.tvDate.setText(curLstPhoto.getDate());
         holder.rvItem.setHasFixedSize(true);
         adpInner=new AdapterInnerRecyclerView(context, curLstPhoto.getLstPhotoHaveSameDate());
@@ -68,7 +71,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return mFilterdata.size();
     }
 
     public void NotifyChange()
@@ -90,6 +93,39 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     {
         return adpInner.getViewType();
     }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString= charSequence.toString();
+                if(charString.isEmpty())
+                {
+                    mFilterdata= data;
+                }else{
+                    ArrayList<ListPhotoSameDate> filteredData = new ArrayList<>();
+                    for(ListPhotoSameDate listPhotoSameDate : data){
+                        if(listPhotoSameDate.getDate().toLowerCase().contains(charString.toLowerCase())){
+                            filteredData.add(listPhotoSameDate);
+                        }
+                    }
+                    mFilterdata = filteredData;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterdata;
+                filterResults.count = mFilterdata.size();
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilterdata = (ArrayList<ListPhotoSameDate>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvDate;
         private RecyclerView rvItem;
@@ -97,6 +133,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
         public ViewHolder(View itemView) {
             super(itemView);
+
             tvDate = itemView.findViewById(R.id.tv_date);
             rvItem = itemView.findViewById(R.id.rv_item);
 

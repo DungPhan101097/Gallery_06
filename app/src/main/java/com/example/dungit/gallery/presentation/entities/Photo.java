@@ -1,6 +1,8 @@
 package com.example.dungit.gallery.presentation.entities;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.io.File;
@@ -24,22 +26,36 @@ public class Photo implements Serializable {
     private String pathImg;
 
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, String nameImg, String sizeImg , String resoluImg, String pathImg) {
+    public Photo(long idImg, String dateTaken, long albumId, String albumName) {
         this.idImg = idImg;
         this.dateTaken = dateTaken;
         this.albumId = albumId;
         this.albumName = albumName;
         this.pathUrl = Uri.withAppendedPath(EXTERNAL_URI, Long.toString(idImg)).toString();
+    }
+
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file) {
+        this(idImg, dateTaken, albumId, albumName);
+        this.file = file;
+    }
+
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file,String nameImg, String sizeImg , String resoluImg ,String pathImg) {
+        this(idImg, dateTaken, albumId, albumName,file);
         this.nameImg = nameImg;
         this.sizeImg = sizeImg;
         this.resoluImg = resoluImg;
         this.pathImg = pathImg;
     }
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName,String nameImg, String sizeImg , String resoluImg ,String pathImg,File file) {
-        this(idImg, dateTaken, albumId, albumName,nameImg,sizeImg,resoluImg,pathImg);
-        this.file = file;
+    protected Photo(Parcel in) {
+        idImg = in.readLong();
+        pathUrl = in.readString();
+        dateTaken = in.readString();
+        albumId = in.readLong();
+        albumName = in.readString();
     }
+
+
 
     public long getIdImg() {
         return idImg;

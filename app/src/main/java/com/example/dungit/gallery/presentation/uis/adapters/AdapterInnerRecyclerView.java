@@ -1,27 +1,22 @@
 package com.example.dungit.gallery.presentation.uis.adapters;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.AlertDialog;
-import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -34,18 +29,19 @@ import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.MyAppGlideModule;
 import com.example.dungit.gallery.presentation.entities.Photo;
+import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> {
+public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Filterable {
 
     private ArrayList<Photo> data;
+    private ArrayList<Photo> mFilterdata;
     private Context context;
     private static final int LIST_ITEM = 1;
     private static final int GRID_ITEM = 0;
@@ -53,6 +49,7 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
 
     public AdapterInnerRecyclerView(Context context, ArrayList<Photo> data) {
         this.data = data;
+        this.mFilterdata =data;
         this.context = context;
     }
 
@@ -70,6 +67,53 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
         }
         return new InnerViewHolder(view);
     }
+
+
+
+    @Override
+    public void onBindViewHolder(@NonNull InnerViewHolder holder, int position) {
+        final Photo curPhoto = mFilterdata.get(position);
+
+        GlideApp.with(context).load(curPhoto.getUrl())
+                .placeholder(R.drawable.place_holder)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .centerCrop()
+                .into(holder.ivItem);
+        holder.txtNAme.setText(curPhoto.getNameImg());
+        holder.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                Intent intent = new Intent(context, PreviewPhotoActivity.class);
+                int imgPostion = 0;
+                if(context instanceof  MainActivity ){
+                    MainActivity mainActivity = (MainActivity) context;
+                    ArrayList<Photo> photos = mainActivity.getArrListPhoto();
+                    if(data != photos) {
+                        PreviewPhotoActivity.setPhotos(photos);
+                        imgPostion = photos.indexOf(data.get(position));
+                        imgPostion = imgPostion >= 0 ? imgPostion : 0;
+                    }
+                }else{
+                    PreviewPhotoActivity.setPhotos(data);
+                    imgPostion=position;
+                }
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
+                try {
+                    context.startActivity(intent);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        });
+    }
+
 
     @Override
     public int getItemViewType(int position) {
@@ -92,86 +136,40 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
 
 
     @Override
-    public void onBindViewHolder(@NonNull InnerViewHolder holder, int position) {
-        final Photo curPhoto = data.get(position);
-
-        GlideApp.with(context).load(curPhoto.getUrl())
-                .placeholder(R.drawable.place_holder)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .centerCrop()
-                .into(holder.ivItem);
-        holder.txtNAme.setText(curPhoto.getNameImg());
-        holder.setItemClickListener(new ItemClickListener() {
+    public Filter getFilter() {
+        return new Filter() {
             @Override
-            public void onClick(View view, int position) {
-                Intent intent = new Intent(context, PreviewPhotoActivity.class);
-                intent.putExtra(PreviewPhotoActivity.IMG_URL_KEY, curPhoto.getUrl());
-                context.startActivity(intent);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-                final String[] option={"Properties","Set As Wallpaper"};
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,android.R.layout.select_dialog_item,option);
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Option");
-                builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                            {
-                                AlertDialog.Builder builder_1 = new AlertDialog.Builder(context);
-                                builder_1.setTitle("Thông Tin Ảnh");
-                                builder_1.setMessage("Name : "+ curPhoto.getNameImg()+
-                                        "\n\nPath : "+curPhoto.getPathImg()+
-                                        "\n\nSize : "+ curPhoto.getSizeImg()+
-                                        "\n\nResolution : "+curPhoto.getResoluImg()+
-                                        "\n\nDate taken : "+curPhoto.getDateTaken());
-                                builder_1.setCancelable(false);
-                                builder_1.setNegativeButton("Đóng", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-
-                                    }
-                                });
-                                AlertDialog alertDialog = builder_1.create();
-                                alertDialog.show();
-                            }break;
-                            case 1:
-                            {
-                                Bitmap bm = BitmapFactory.decodeFile(curPhoto.getPathImg());
-                                WallpaperManager myWallpaperManager
-                                        = WallpaperManager.getInstance(context);
-                                try {
-                                    myWallpaperManager.setBitmap(bm);
-                                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                                break;
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString= charSequence.toString();
+                if(charString.isEmpty())
+                {
+                    mFilterdata= data;
+                }else{
+                    ArrayList<Photo> filteredData = new ArrayList<>();
+                    for(Photo photo : data){
+                        if(photo.getNameImg().toLowerCase().contains(charString.toLowerCase()))
+                        {
+                            filteredData.add(photo);
                         }
                     }
-                });
-                builder.setCancelable(false);
-                builder.setNegativeButton("Đóng", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+                    mFilterdata = filteredData;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterdata;
+                return filterResults;
             }
-        });
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilterdata = (ArrayList<Photo>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return mFilterdata.size();
     }
 
     public static class InnerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
@@ -187,7 +185,6 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
-
 
         public void setItemClickListener(ItemClickListener itemClickListener) {
             this.itemClickListener = itemClickListener;

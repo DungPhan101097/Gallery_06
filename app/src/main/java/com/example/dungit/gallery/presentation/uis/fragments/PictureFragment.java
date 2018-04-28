@@ -34,7 +34,6 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
     private AdapterInnerRecyclerView adpInnerRec;
     private boolean gridMode=false;
 
-
     private MainActivity main;
     private RecyclerView rvWrapper;
 
@@ -72,25 +71,14 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         return view;
     }
 
-    @Override
-    public void onChangeView(EMODE mode) {
-        switch (mode) {
-            case MODE_BY_DATE:
-                gridMode=false;
-                rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-                rvWrapper.setAdapter(adpRecView);
-                break;
-            case MODE_GRID:
-               gridMode=true;
-               boolean isSwitched = adpRecView.getViewType();
-               if(isSwitched)
-                rvWrapper.setLayoutManager( new GridLayoutManager(main, 4));
-               else
-                   rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-                rvWrapper.setAdapter(new AdapterInnerRecyclerView(main, lstPhoto));
-                break;
-        }
+    public void search(String newText)
+    {
+        if(gridMode)
+            adpInnerRec.getFilter().filter(newText);
+        else
+            adpRecView.getFilter().filter(newText);
     }
+
     public void onChangeViewType()
     {
         boolean isSwitched = adpRecView.toggle();
@@ -106,4 +94,24 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
 
     }
 
+    @Override
+    public void onChangeView(EMODE mode) {
+        switch (mode) {
+            case MODE_BY_DATE:
+                gridMode=false;
+                rvWrapper.setLayoutManager(new LinearLayoutManager(main));
+                rvWrapper.setAdapter(adpRecView);
+                break;
+            case MODE_GRID:
+                gridMode=true;
+                boolean isSwitched = adpRecView.getViewType();
+                if(isSwitched)
+                    rvWrapper.setLayoutManager( new GridLayoutManager(main, 4));
+                else
+                    rvWrapper.setLayoutManager(new LinearLayoutManager(main));
+                adpInnerRec=new AdapterInnerRecyclerView(main, lstPhoto);
+                rvWrapper.setAdapter(adpInnerRec);
+                break;
+        }
+    }
 }

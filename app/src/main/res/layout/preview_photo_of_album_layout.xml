@@ -9,6 +9,15 @@
     android:gravity="center_vertical|center_horizontal"
     android:layout_margin="1dp">
 
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/tb_top_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:title="Gallery">
+    </android.support.v7.widget.Toolbar>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_wrapper_preview_lst_photo"
         android:layout_width="match_parent"

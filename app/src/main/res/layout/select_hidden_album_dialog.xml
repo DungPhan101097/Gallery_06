@@ -7,23 +7,23 @@
     <ListView
         android:id="@+id/listHiddenAlbum"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
+        android:layout_height="wrap_content"
         android:dividerHeight="1dp"
+        android:layout_weight="8"
         android:divider="@android:color/darker_gray"
         />
 
     <Button
         android:id="@+id/btnShowAlbum"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="50dp"
         android:layout_weight="1"
         android:text="Hiển thị album"/>
 
     <Button
         android:id="@+id/btnCancelHideDialog"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="50dp"
         android:layout_weight="1"
         android:text="Hủy"/>
 </LinearLayout>
