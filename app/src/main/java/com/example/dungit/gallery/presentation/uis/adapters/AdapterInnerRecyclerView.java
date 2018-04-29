@@ -172,6 +172,7 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
         return mFilterdata.size();
     }
 
+
     public static class InnerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnLongClickListener {
         private ImageView ivItem;

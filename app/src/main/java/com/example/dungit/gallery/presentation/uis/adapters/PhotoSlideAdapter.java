@@ -32,13 +32,17 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private boolean isShowTB = true;
+    private int curPosition;
 
     public PhotoSlideAdapter(Context context, ArrayList<Photo> images,Toolbar toolbar,BottomNavigationView bottomNavigationView) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
-        this.toolbar=toolbar;
-        this.bottomNavigationView=bottomNavigationView;
+        if(context instanceof  PreviewPhotoActivity) {
+            PreviewPhotoActivity ppA = (PreviewPhotoActivity)context;
+            this.toolbar = ppA.getToolbar();
+            this.bottomNavigationView = ppA.getbNV();
+        }
     }
 
     @Override
@@ -55,29 +59,22 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     public Object instantiateItem(final ViewGroup view, int position) {
         View myImageLayout = inflater.inflate(R.layout.preview_photo_layout, view, false);
         Photo photo=images.get(position);
+        curPosition=position;
         ImageView myImage = myImageLayout
                 .findViewById(R.id.im_preview_photo);
         GlideApp.with(context).load(photo.getUrl())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(myImage);
-        if(context instanceof PreviewPhotoActivity){
-            toolbar.setTitle(photo.getFile().getName());
-        }
+
         myImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toogleShowTB();
             }
         });
-
         view.addView(myImageLayout, 0);
         return myImageLayout;
-    }
-
-    @Override
-    public int getItemPosition(@NonNull Object object) {
-        return super.getItemPosition(object);
     }
 
     private void toogleShowTB(){
@@ -91,6 +88,10 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         isShowTB = !isShowTB;
     }
 
+        public int getPos()
+        {
+            return curPosition;
+        }
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
