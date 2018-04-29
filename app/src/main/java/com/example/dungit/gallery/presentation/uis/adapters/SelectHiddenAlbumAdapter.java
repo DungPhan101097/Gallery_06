@@ -16,15 +16,16 @@ import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.uis.viewholder.AlbumViewHolder;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public class SelectHiddenAlbumAdapter extends ArrayAdapter {
 
     private Context context;
-    private LinkedList<Album> unhideAlbums;
-    private LinkedList<Album> hiddenAlbums;
+    private List<Album> unhideAlbums;
+    private List<Album> hiddenAlbums;
 
     public SelectHiddenAlbumAdapter(Context context
-            ,LinkedList<Album> hiddenAlbums,LinkedList<Album> unhideAlbums) {
+            ,List<Album> hiddenAlbums,List<Album> unhideAlbums) {
         super(context, R.layout.select_hidden_album_item,hiddenAlbums);
         this.context=context;
         this.unhideAlbums=unhideAlbums;

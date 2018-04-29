@@ -15,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.Utils.SortType;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.viewholder.AlbumViewHolder;
@@ -23,18 +24,21 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by thaib on 17/04/2018.
  */
 
-public class AlbumAdapter extends ArrayAdapter {
+public class AlbumAdapter extends ArrayAdapter implements Observer{
 
     private Context context;
-    private LinkedList<Album> albums;
+    private List<Album> albums;
     public static final File albumsLocation = new File(Environment.getExternalStorageDirectory(), "Albums06/");
 
-    public AlbumAdapter(Context context, LinkedList<Album> albums) {
+    public AlbumAdapter(Context context, List<Album> albums) {
         super(context, R.layout.album_list_item, albums);
         this.context = context;
         this.albums = albums;
@@ -90,7 +94,7 @@ public class AlbumAdapter extends ArrayAdapter {
         this.notifyDataSetChanged();
     }
 
-    public LinkedList<Album> getAlbums() {
+    public List<Album> getAlbums() {
         return albums;
     }
 
@@ -112,5 +116,14 @@ public class AlbumAdapter extends ArrayAdapter {
             }
         });
         this.notifyDataSetChanged();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(observable instanceof DBHelper){
+            DBHelper dbHelper = (DBHelper)observable;
+            this.albums = dbHelper.getListAlbum();
+            this.notifyDataSetChanged();
+        }
     }
 }

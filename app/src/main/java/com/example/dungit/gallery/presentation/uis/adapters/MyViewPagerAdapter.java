@@ -14,7 +14,7 @@ import java.util.List;
 
 public class MyViewPagerAdapter extends FragmentStatePagerAdapter {
     // Tab Captions
-    private String tabCaption[] = new String[] { "PICTURES", "ALBUMS", "STORIES" };
+    private String tabCaption[] = new String[] { "PICTURES", "ALBUMS"};
     private ArrayList<Fragment> lstFragMent;
 
     public MyViewPagerAdapter(FragmentManager fragmentManager) {

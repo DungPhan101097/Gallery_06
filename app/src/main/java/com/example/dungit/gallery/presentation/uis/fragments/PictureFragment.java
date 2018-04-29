@@ -62,6 +62,9 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         gridLayoutManager = new GridLayoutManager(main, 4);
         adapterRecyclerView = new AdapterRecyclerView(main, lstPhotoSameDate);
         adapterInnerRecyclerView = new AdapterInnerRecyclerView(main, lstPhoto);
+
+        main.getDBHelper().addObserver(adapterInnerRecyclerView);
+        main.getDBHelper().addObserver(adapterRecyclerView);
     }
 
     @Override
