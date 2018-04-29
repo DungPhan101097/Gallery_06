@@ -192,8 +192,4 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
     public DBHelper getDBHelper() {
         return dbHelper;
     }
-
-    public ArrayList<Photo> getArrListPhoto() {
-        return arrListPhoto;
-    }
 }

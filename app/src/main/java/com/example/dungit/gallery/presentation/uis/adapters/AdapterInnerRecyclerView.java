@@ -38,7 +38,8 @@ import java.util.Observer;
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer{
+public class AdapterInnerRecyclerView
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer{
 
 
     private ArrayList<Photo> data;
@@ -81,7 +82,7 @@ public class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerR
                 int imgPostion = 0;
                 if(context instanceof  MainActivity ){
                     MainActivity mainActivity = (MainActivity) context;
-                    ArrayList<Photo> photos = mainActivity.getArrListPhoto();
+                    ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
                     if(data != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(data.get(position));
