@@ -50,6 +50,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static int currentPage = 0;
 
     private static ArrayList<Photo> photos = null;
+    private BottomNavigationView bNV = null;
+    private Toolbar toolbar = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,25 +64,48 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (photos != null && intent != null) {
-            currentPage= intent.getIntExtra(IMG_POSITION,0);
-            final Toolbar toolbar = findViewById(R.id.photo_toolbar_top);
+            currentPage = intent.getIntExtra(IMG_POSITION, 0);
+            toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
-            final BottomNavigationView bottomNavigationView= findViewById(R.id.bottom_navigation);
+            bNV = findViewById(R.id.bottom_navigation);
 
 
             mPager = findViewById(R.id.pager_photo);
-            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this,photos,toolbar,bottomNavigationView));
+            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this, photos));
             mPager.setCurrentItem(currentPage);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+            ViewPager viewPager = findViewById(R.id.pager_photo);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    final Photo photo = photos.get(position);
+                    String name = photo.getFile().getName();
+                    getSupportActionBar().setTitle(name);
+                }
 
+                @Override
+                public void onPageSelected(int position) {
 
+                }
 
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
         }
     }
 
+    public BottomNavigationView getbNV() {
+        return bNV;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
 
     public static void setPhotos(ArrayList<Photo> photos) {
         PreviewPhotoActivity.photos = photos;
