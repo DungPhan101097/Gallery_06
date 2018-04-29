@@ -11,15 +11,5 @@
         app:showAsAction="always"
         />
 
-    <item
-        android:id="@+id/act_settings"
-        android:orderInCategory="180"
-        android:title="Settings"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/act_about"
-        android:orderInCategory="200"
-        android:title="About"
-        app:showAsAction="never" />
 
 </menu>

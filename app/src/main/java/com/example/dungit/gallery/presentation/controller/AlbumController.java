@@ -16,6 +16,7 @@ import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.Utils.ImageFileFilter;
 import com.example.dungit.gallery.presentation.Utils.SortType;
 import com.example.dungit.gallery.presentation.databasehelper.AlbumDatabaseHelper;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.AlbumAdapter;
@@ -26,6 +27,7 @@ import com.example.dungit.gallery.presentation.uis.dialog.InputDialog;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -44,13 +46,14 @@ public class AlbumController {
     private Context context;
     private AlbumAdapter albumAdapter;
     private AlbumDatabaseHelper databaseHelper;
-    private LinkedList<Album> hiddenAlbums;
+    private DBHelper dbHelper;
 
-    public AlbumController(Context context, AlbumAdapter albumAdapter, LinkedList<Album> hiddenAlbums) {
+
+    public AlbumController(Context context, AlbumAdapter albumAdapter, DBHelper dbHelper) {
         this.context = context;
         databaseHelper = new AlbumDatabaseHelper(context);
         this.albumAdapter = albumAdapter;
-        this.hiddenAlbums= hiddenAlbums;
+        this.dbHelper = dbHelper;
     }
 
 
@@ -76,8 +79,9 @@ public class AlbumController {
                 if (newAlbumFile.mkdirs()) {
                     Album album = new Album(newAlbumFile.hashCode(), output);
                     album.setFile(newAlbumFile);
-                    albumAdapter.getAlbums().add(album);
-                    albumAdapter.notifyDataSetChanged();
+
+                    dbHelper.addNewAlbum(album);
+
                     inputDialog.cancel();
                 } else {
                     Toast.makeText(context, "Không thể tạo album " + output + " hãy chọn tên khác", Toast.LENGTH_SHORT).show();
@@ -94,17 +98,7 @@ public class AlbumController {
                 , "Xóa", "hủy") {
             @Override
             public void onPositiveButtonClick() {
-                if (album.isEmpty()) {
-                    File file=album.getFile();
-                    file.delete();
-                } else {
-                    String idStr = String.valueOf(album.getId());
-                    context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            MediaStore.Images.ImageColumns.BUCKET_ID + " = ?",
-                            new String[]{idStr});
-                }
-                albumAdapter.getAlbums().remove(album);
-                albumAdapter.notifyDataSetChanged();
+               dbHelper.deleteAlbum(album);
             }
         };
         confirmDialog.showDialog();
@@ -133,14 +127,15 @@ public class AlbumController {
                     Toast.makeText(context, "Tên album đã tồn tại", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 String name = databaseHelper.getBucketName(album.getId());
                 if (name == null) {
                     databaseHelper.insertBucketName(album.getId(), output);
                 } else {
                     databaseHelper.updateBucketName(album.getId(), output);
                 }
-                album.setName(output);
-                albumAdapter.notifyDataSetChanged();
+                dbHelper.renameAlbum(album, output);
+
                 inputDialog.cancel();
             }
         };
@@ -153,10 +148,7 @@ public class AlbumController {
                 , "Ẩn", "Hủy") {
             @Override
             public void onPositiveButtonClick() {
-                databaseHelper.insertHideAlbum(album.getId());
-                albumAdapter.getAlbums().remove(album);
-                hiddenAlbums.add(album);
-                albumAdapter.notifyDataSetChanged();
+                dbHelper.hideAlbum(album, databaseHelper);
             }
         };
         confirmDialog.showDialog();
@@ -184,42 +176,7 @@ public class AlbumController {
         SelectAlbumAdapter albumAdapter_ = new SelectAlbumAdapter(context, albumAdapter.getAlbums()) {
             @Override
             public void onRowClick(Album clickedAlbum) {
-                File nAlbumFile = clickedAlbum.getFile();
-
-                LinkedList<Photo> photos = album.getPhotos();
-
-                for (Photo photo : photos) {
-                    File filePhoto = photo.getFile();
-                    File newFile = new File(nAlbumFile, filePhoto.getName());
-                    if (filePhoto.renameTo(newFile)) {
-                        Intent scanFileIntent = new Intent(
-                                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile));
-                        context.sendBroadcast(scanFileIntent);
-                        photo.setFile(newFile);
-                        clickedAlbum.addPhoto(photo);
-                    }
-//                    File filePhoto = photo.getFile();
-//                    File newFile = new File(nAlbumFile,filePhoto.getName());
-//                    if(filePhoto.exists()) {
-//                        try {
-//                            FileChannel src = new FileInputStream(filePhoto).getChannel();
-//                            FileChannel dst = new FileOutputStream(newFile).getChannel();
-//                            dst.transferFrom(src, 0, src.size());
-//                            Intent scanFileIntent = new Intent(
-//                                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile));
-//                            context.sendBroadcast(scanFileIntent);
-//                            photo.setFile(newFile);
-//                            clickedAlbum.addPhoto(photo);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-                }
-                context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        MediaStore.Images.ImageColumns.BUCKET_ID + " = ?",
-                        new String[]{String.valueOf(album.getId())});
-                album.clearAlbum();
-                albumAdapter.notifyDataSetChanged();
+                dbHelper.moveAlbum(album, clickedAlbum);
                 dialog.cancel();
             }
         };
@@ -228,13 +185,13 @@ public class AlbumController {
     }
 
     public void unhideAlbum(){
-        if(hiddenAlbums.size() <= 0){
+        if(dbHelper.getListHiddenAlbums().size() <= 0){
             Toast.makeText(context,"Chưa có album nào bị ẩn",Toast.LENGTH_SHORT).show();
             return;
         }
         final Dialog dialog = new Dialog(context);
-        final LinkedList<Album> unhideAlbums = new LinkedList<>();
-        final LinkedList<Album> albums = albumAdapter.getAlbums();
+        final List<Album> unhideAlbums = new LinkedList<>();
+        final List<Album> albums = albumAdapter.getAlbums();
         dialog.setContentView(R.layout.select_hidden_album_dialog);
         View view = dialog.getWindow().getDecorView();
         final ListView listView = view.findViewById(R.id.listHiddenAlbum);
@@ -245,22 +202,17 @@ public class AlbumController {
                 dialog.cancel();
             }
         });
-        final LinkedList<Album> unhideAlbums_ = unhideAlbums;
+        final List<Album> unhideAlbums_ = unhideAlbums;
         Button btnUnhid = view.findViewById(R.id.btnShowAlbum);
         btnUnhid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                for (Album unhideAlbum: unhideAlbums_) {
-                    albums.add(unhideAlbum);
-                    hiddenAlbums.remove(unhideAlbum);
-                    databaseHelper.removeHideAlbum(unhideAlbum.getId());
-                }
-                albumAdapter.notifyDataSetChanged();
+                dbHelper.reShowAlbum(unhideAlbums_,databaseHelper);
                 dialog.cancel();
             }
         });
         SelectHiddenAlbumAdapter albumAdapter_ = new SelectHiddenAlbumAdapter(context
-                ,hiddenAlbums,unhideAlbums) ;
+                ,dbHelper.getListHiddenAlbums(),unhideAlbums) ;
         listView.setAdapter(albumAdapter_);
         dialog.show();
 
