@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://C:\Users\MINHTOAN\Desktop\Gallery_06-BAO\Gallery.iml" filepath="C:\Users\MINHTOAN\Desktop\Gallery_06-BAO\Gallery.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gallery_06-BAO.iml" filepath="$PROJECT_DIR$/Gallery_06-BAO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
