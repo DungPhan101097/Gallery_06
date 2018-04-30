@@ -78,6 +78,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
             ViewPager viewPager = findViewById(R.id.pager_photo);
+
             viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

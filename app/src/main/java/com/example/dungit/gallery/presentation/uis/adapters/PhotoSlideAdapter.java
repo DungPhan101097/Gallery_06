@@ -21,6 +21,7 @@ import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
@@ -58,7 +59,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     public Object instantiateItem(final ViewGroup view, int position) {
         View myImageLayout = inflater.inflate(R.layout.preview_photo_layout, view, false);
         final Photo photo=images.get(position);
-        ImageView myImage = myImageLayout
+        PhotoView myImage = myImageLayout
                 .findViewById(R.id.im_preview_photo);
 
         GlideApp.with(context).load(photo.getUrl())
