@@ -1,6 +1,7 @@
 package com.example.dungit.gallery.presentation.uis.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements MainCallback {
 
@@ -143,6 +145,10 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
                     pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
 
                 }
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(MainActivity.this,SettingActivity.class);
+                this.startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);

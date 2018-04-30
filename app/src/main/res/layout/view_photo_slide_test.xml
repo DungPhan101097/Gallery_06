@@ -30,6 +30,7 @@
         app:menu="@menu/photo_bottom_menu"
         app:itemTextColor="@color/black"
         app:itemIconTint="@color/black"
+
         />
 
 </android.support.design.widget.CoordinatorLayout>

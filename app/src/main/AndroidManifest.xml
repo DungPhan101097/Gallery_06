@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dungit.gallery">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -18,13 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".presentation.uis.activities.PreviewPhotoActivity"/>
-
-        <activity android:name=".presentation.uis.controller.ZoomInZoomOut"/>
-
-        <activity android:name=".presentation.uis.activities.PreviewPhotoOfAlbumActivity"/>
-
+        <activity android:name=".presentation.uis.activities.PreviewPhotoActivity" />
+        <activity android:name=".presentation.uis.controller.ZoomInZoomOut" />
+        <activity android:name=".presentation.uis.activities.PreviewPhotoOfAlbumActivity" />
+        <activity android:name=".presentation.uis.activities.SettingActivity"></activity>
     </application>
 
 </manifest>

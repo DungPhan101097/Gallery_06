@@ -39,7 +39,7 @@ import java.util.Observer;
  */
 
 public class AdapterInnerRecyclerView
-        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer{
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer {
 
 
     private ArrayList<Photo> data;
@@ -80,25 +80,20 @@ public class AdapterInnerRecyclerView
             public void onClick(View view, int position) {
                 Intent intent = new Intent(context, PreviewPhotoActivity.class);
                 int imgPostion = 0;
-                if(context instanceof  MainActivity ){
+                if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
-                    if(data != photos) {
+                    if (data != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(data.get(position));
                         imgPostion = imgPostion >= 0 ? imgPostion : 0;
                     }
-                }else{
+                } else {
                     PreviewPhotoActivity.setPhotos(data);
-                    imgPostion=position;
+                    imgPostion = position;
                 }
-                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
-                try {
-                    context.startActivity(intent);
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION, imgPostion);
+                context.startActivity(intent);
             }
 
             @Override
@@ -115,8 +110,8 @@ public class AdapterInnerRecyclerView
 
     @Override
     public void update(Observable observable, Object o) {
-        if(observable instanceof DBHelper){
-            DBHelper dbHelper = (DBHelper)observable;
+        if (observable instanceof DBHelper) {
+            DBHelper dbHelper = (DBHelper) observable;
             this.data = dbHelper.getListPhoto();
             this.notifyDataSetChanged();
         }

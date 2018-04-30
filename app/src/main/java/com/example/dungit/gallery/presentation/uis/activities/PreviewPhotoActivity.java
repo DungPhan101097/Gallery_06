@@ -1,42 +1,29 @@
 package com.example.dungit.gallery.presentation.uis.activities;
 
-import android.animation.ObjectAnimator;
-import android.animation.TimeInterpolator;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.transition.Explode;
-import android.util.Log;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
 import android.support.v7.widget.Toolbar;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.dungit.gallery.R;
-import com.example.dungit.gallery.presentation.GlideApp;
+import com.example.dungit.gallery.presentation.uis.animation.FadePageTransformer;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.PhotoSlideAdapter;
 
 import java.util.ArrayList;
 
-import me.relex.circleindicator.CircleIndicator;
+import static com.example.dungit.gallery.presentation.Utils.MenuUtils.removeShiftMode;
 
 /**
  * Created by DUNGIT on 4/23/2018.
@@ -46,12 +33,19 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     public static final String IMG_URL_KEY = "img_url_key";
     public static final String IMG_POSITION = "img_postion_key";
 
-    private static ViewPager mPager;
+    private ViewPager mPager;
     private static int currentPage = 0;
 
     private static ArrayList<Photo> photos = null;
     private BottomNavigationView bNV = null;
     private Toolbar toolbar = null;
+
+    private static int slideShowDelay= 5000;
+    private static boolean isSlideRunning = false;
+    private static boolean isShowTB = true;
+
+    private static ViewPager.PageTransformer slideAnimation = null;
+    private static ViewPager.PageTransformer slideShowAnimation = new FadePageTransformer();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,11 +62,23 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
             bNV = findViewById(R.id.bottom_navigation);
+            removeShiftMode(bNV);
 
 
             mPager = findViewById(R.id.pager_photo);
-            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this, photos));
+            PhotoSlideAdapter adapter = new PhotoSlideAdapter(PreviewPhotoActivity.this, photos){
+                @Override
+                public void onInnerViewClick(View v) {
+                    if(isSlideRunning){
+                        stopSlideShow();
+                    }else{
+                        toogleShowTB();
+                    }
+                }
+            };
+            mPager.setAdapter(adapter);
             mPager.setCurrentItem(currentPage);
+            mPager.setPageTransformer(false,slideAnimation);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -84,6 +90,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     final Photo photo = photos.get(position);
                     String name = photo.getFile().getName();
                     getSupportActionBar().setTitle(name);
+                    currentPage = position;
                 }
 
                 @Override
@@ -96,15 +103,40 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
                 }
             });
+
+            bNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = item.getItemId();
+                    if(id == R.id.photo_action_slideshow){
+                        if(handler != null) {
+                            if (!isSlideRunning) {
+                                startSlideShow();
+                            } else {
+                                stopSlideShow();
+                            }
+                        }
+                    }
+                    return false;
+                }
+            });
         }
     }
 
-    public BottomNavigationView getbNV() {
-        return bNV;
+    private void startSlideShow(){
+        mPager.setPageTransformer(false
+                , slideShowAnimation);
+        handler.postDelayed(slideShow,slideShowDelay);
+        hideTB();
+        isSlideRunning = true;
     }
 
-    public Toolbar getToolbar() {
-        return toolbar;
+    private void stopSlideShow(){
+        mPager.setPageTransformer(false
+                , slideAnimation);
+        handler.removeCallbacks(slideShow);
+        showTB();
+        isSlideRunning = false;
     }
 
     public static void setPhotos(ArrayList<Photo> photos) {
@@ -117,4 +149,68 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         return true;
     }
 
+    private Handler handler =new Handler();
+
+    private Runnable slideShow = new Runnable() {
+        @Override
+        public void run() {
+            int pos = currentPage+1;
+            if(pos >= photos.size()){
+                pos = 0;
+            }
+            mPager.setCurrentItem(pos, true);
+            handler.postDelayed(slideShow, slideShowDelay);
+        }
+    };
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (handler!= null) {
+            handler.removeCallbacks(slideShow);
+            isSlideRunning = false;
+        }
+    }
+
+    public void toogleShowTB(){
+        if (toolbar != null && bNV != null) {
+            if (isShowTB) {
+                hideTB();
+            } else {
+                showTB();
+            }
+        }
+    }
+
+    public void showTB(){
+            toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+            bNV.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+            isShowTB = true;
+
+    }
+
+    public void hideTB(){
+
+            toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+            bNV.animate().translationY(bNV.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+            isShowTB = false;
+    }
+
+    public static int getSlideShowDelay() {
+        return slideShowDelay;
+    }
+
+    public static void setSlideShowDelay(int slideShowDelay) {
+        if(slideShowDelay < 0)
+            return;
+        PreviewPhotoActivity.slideShowDelay = slideShowDelay;
+    }
+
+    public static ViewPager.PageTransformer getSlideAnimation() {
+        return slideAnimation;
+    }
+
+    public static void setSlideAnimation(ViewPager.PageTransformer slideAnimation) {
+        PreviewPhotoActivity.slideAnimation = slideAnimation;
+    }
 }

@@ -10,6 +10,11 @@
         android:title="Change view"
         app:showAsAction="always"
         />
-
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/btn_gallery_detail_mode"
+        android:orderInCategory="120"
+        android:title="Settings"
+        />
 
 </menu>
