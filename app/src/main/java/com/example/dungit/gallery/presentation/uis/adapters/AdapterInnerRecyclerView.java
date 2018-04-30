@@ -98,13 +98,13 @@ public class AdapterInnerRecyclerView
                 if(context instanceof  MainActivity ){
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
-                    if(data != photos) {
+                    if(mFilterdata != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
-                        imgPostion = photos.indexOf(data.get(position));
+                        imgPostion = photos.indexOf(mFilterdata.get(position));
                         imgPostion = imgPostion >= 0 ? imgPostion : 0;
                     }
                 }else{
-                    PreviewPhotoActivity.setPhotos(data);
+                    PreviewPhotoActivity.setPhotos(mFilterdata);
                     imgPostion=position;
                 }
                 intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
