@@ -14,16 +14,20 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.example.dungit.gallery.R;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> implements Filterable {
+public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>
+        implements Observer,Filterable {
 
     private ArrayList<ListPhotoSameDate> data;
     private ArrayList<ListPhotoSameDate> mFilterdata;
@@ -38,6 +42,11 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         this.data = data;
         this.mFilterdata =data;
         this.context = context;
+    }
+
+
+    public void setData(ArrayList<ListPhotoSameDate> data) {
+        this.data = data;
     }
 
     @NonNull
@@ -73,6 +82,18 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     public int getItemCount() {
         return mFilterdata.size();
     }
+
+    @Override
+    public void update(Observable observable, Object o) {
+       if(observable instanceof DBHelper){
+           DBHelper dbHelper = (DBHelper)observable;
+           this.mFilterdata = dbHelper.getListPhotoByDate();
+           this.notifyDataSetChanged();
+
+       }
+    }
+
+  // Ham danh cho Filter va ViewType
 
     public void NotifyChange()
     {
@@ -125,6 +146,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
             }
         };
     }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvDate;

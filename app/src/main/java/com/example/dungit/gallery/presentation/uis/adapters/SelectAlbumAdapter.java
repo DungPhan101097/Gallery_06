@@ -14,12 +14,13 @@ import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.uis.viewholder.AlbumViewHolder;
 
 import java.util.LinkedList;
+import java.util.List;
 
 public abstract class SelectAlbumAdapter extends ArrayAdapter {
     private Context context;
-    private LinkedList<Album> albums;
+    private List<Album> albums;
 
-    public SelectAlbumAdapter(Context context, LinkedList<Album> albums) {
+    public SelectAlbumAdapter(Context context, List<Album> albums) {
         super(context, R.layout.album_list_item,albums);
         this.context=context;
         this.albums=albums;

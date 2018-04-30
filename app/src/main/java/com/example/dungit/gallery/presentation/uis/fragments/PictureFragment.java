@@ -3,10 +3,15 @@ package com.example.dungit.gallery.presentation.uis.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,18 +29,20 @@ import java.util.ArrayList;
 /**
  * Created by DUNGIT on 4/22/2018.
  */
-public class PictureFragment extends Fragment implements PictureFragCallback {
+public class PictureFragment extends Fragment implements PictureFragCallback,SearchView.OnQueryTextListener{
     private static final String KEY_LIST_PHOTO = "list_photo";
     private static final String KEY_MODE = "mode_preview_photo";
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
     private ArrayList<Photo> lstPhoto;
     private EMODE mode;
-    private AdapterRecyclerView adpRecView;
-    private AdapterInnerRecyclerView adpInnerRec;
-    private boolean gridMode=false;
 
     private MainActivity main;
     private RecyclerView rvWrapper;
+    private AdapterRecyclerView adapterRecyclerView;
+    private AdapterInnerRecyclerView adapterInnerRecyclerView;
+    private LinearLayoutManager linearLayoutManager;
+    private GridLayoutManager gridLayoutManager;
+    private boolean gridMode=false;
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
         PictureFragment fragment = new PictureFragment();
@@ -55,6 +62,37 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         for (ListPhotoSameDate listPhotoSameDate : lstPhotoSameDate) {
             lstPhoto.addAll(listPhotoSameDate.getLstPhotoHaveSameDate());
         }
+        mode = EMODE.MODE_BY_DATE;
+
+        linearLayoutManager = new LinearLayoutManager(main);
+        gridLayoutManager = new GridLayoutManager(main, 4);
+        adapterRecyclerView = new AdapterRecyclerView(main, lstPhotoSameDate);
+        adapterInnerRecyclerView = new AdapterInnerRecyclerView(main, lstPhoto);
+
+        main.getDBHelper().addObserver(adapterInnerRecyclerView);
+        main.getDBHelper().addObserver(adapterRecyclerView);
+        setHasOptionsMenu(true);
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.option_menu_picture, menu);
+        final MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_viewType:
+                onChangeViewType();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -64,54 +102,83 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
 
         rvWrapper = view.findViewById(R.id.rv_wrapper);
         rvWrapper.setHasFixedSize(true);
-        rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-        adpRecView=new AdapterRecyclerView(main, lstPhotoSameDate);
-        rvWrapper.setAdapter(adpRecView);
+
+        rvWrapper.setLayoutManager(linearLayoutManager);
+        rvWrapper.setAdapter(adapterRecyclerView);
 
         return view;
     }
 
-    public void search(String newText)
-    {
-        if(gridMode)
-            adpInnerRec.getFilter().filter(newText);
-        else
-            adpRecView.getFilter().filter(newText);
-    }
-
-    public void onChangeViewType()
-    {
-        boolean isSwitched = adpRecView.toggle();
-        adpRecView.setLayout(isSwitched);
-        adpRecView.NotifyChange();
-        if(gridMode)
-        {
-            if(isSwitched)
-                rvWrapper.setLayoutManager( new GridLayoutManager(main, 4));
-            else
-                rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-        }
-
-    }
-
     @Override
     public void onChangeView(EMODE mode) {
+        this.mode = mode;
         switch (mode) {
             case MODE_BY_DATE:
                 gridMode=false;
-                rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-                rvWrapper.setAdapter(adpRecView);
+                rvWrapper.setLayoutManager(linearLayoutManager);
+                rvWrapper.setAdapter(adapterRecyclerView);
                 break;
             case MODE_GRID:
                 gridMode=true;
-                boolean isSwitched = adpRecView.getViewType();
+                boolean isSwitched = adapterRecyclerView.getViewType();
                 if(isSwitched)
-                    rvWrapper.setLayoutManager( new GridLayoutManager(main, 4));
+                    rvWrapper.setLayoutManager(gridLayoutManager);
                 else
-                    rvWrapper.setLayoutManager(new LinearLayoutManager(main));
-                adpInnerRec=new AdapterInnerRecyclerView(main, lstPhoto);
-                rvWrapper.setAdapter(adpInnerRec);
+                    rvWrapper.setLayoutManager(linearLayoutManager);
+                    rvWrapper.setAdapter(adapterInnerRecyclerView);
                 break;
         }
     }
+
+    @Override
+    public void onChangeDataView(ArrayList<ListPhotoSameDate> listPhotoByDate, ArrayList<Photo> lstPhoto) {
+        this.lstPhotoSameDate = listPhotoByDate;
+        this.lstPhoto = lstPhoto;
+        adapterRecyclerView.setData(this.lstPhotoSameDate);
+        adapterInnerRecyclerView.setData(this.lstPhoto);
+
+        switch (mode) {
+            case MODE_BY_DATE:
+                adapterRecyclerView.notifyDataSetChanged();
+                break;
+            case MODE_GRID:
+                adapterInnerRecyclerView.notifyDataSetChanged();
+                break;
+        }
+    }
+
+    //Ham cho changeviewtype
+    public void onChangeViewType()
+    {
+        boolean isSwitched = adapterRecyclerView.toggle();
+        adapterRecyclerView.setLayout(isSwitched);
+        adapterRecyclerView.NotifyChange();
+        if(gridMode)
+        {
+            if(isSwitched)
+                rvWrapper.setLayoutManager(gridLayoutManager);
+            else
+                rvWrapper.setLayoutManager(linearLayoutManager);
+        }
+
+    }
+
+    //Hàm cho filter
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String text = newText;
+        if(gridMode)
+            adapterInnerRecyclerView.getFilter().filter(newText);
+        else
+            adapterRecyclerView.getFilter().filter(newText);
+        return false;
+    }
+
+
 }

@@ -2,10 +2,10 @@ package com.example.dungit.gallery.presentation.uis.adapters;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +32,8 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private boolean isShowTB = true;
-    private int curPosition;
 
-    public PhotoSlideAdapter(Context context, ArrayList<Photo> images,Toolbar toolbar,BottomNavigationView bottomNavigationView) {
+    public PhotoSlideAdapter(Context context, ArrayList<Photo> images) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
@@ -58,10 +57,10 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     @Override
     public Object instantiateItem(final ViewGroup view, int position) {
         View myImageLayout = inflater.inflate(R.layout.preview_photo_layout, view, false);
-        Photo photo=images.get(position);
-        curPosition=position;
+        final Photo photo=images.get(position);
         ImageView myImage = myImageLayout
                 .findViewById(R.id.im_preview_photo);
+
         GlideApp.with(context).load(photo.getUrl())
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -73,27 +72,29 @@ public class PhotoSlideAdapter  extends PagerAdapter{
                 toogleShowTB();
             }
         });
-        view.addView(myImageLayout, 0);
+
+        view.addView(myImageLayout,0);
         return myImageLayout;
     }
 
     private void toogleShowTB(){
-        if(isShowTB){
-            toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-            bottomNavigationView.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-        }else{
-            toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
-            bottomNavigationView.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+        if (toolbar != null && bottomNavigationView != null) {
+            if (isShowTB) {
+
+                toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+                bottomNavigationView.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+            } else {
+                toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+                bottomNavigationView.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+            }
+            isShowTB = !isShowTB;
         }
-        isShowTB = !isShowTB;
     }
 
-        public int getPos()
-        {
-            return curPosition;
-        }
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
     }
+
+
 }

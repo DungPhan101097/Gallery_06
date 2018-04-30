@@ -3,15 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="csu.matos.MainActivity" >
-
-    <item
-        android:id="@+id/action_search"
-        android:title="Search"
-        android:orderInCategory="200"
-        android:icon="@drawable/ic_search"
-        app:showAsAction="ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        />
     <item
         android:id="@+id/act_change_view"
         android:icon="@drawable/btn_gallery_detail_mode"
@@ -20,20 +11,6 @@
         app:showAsAction="always"
         />
 
-    <item
-        android:id="@+id/act_settings"
-        android:orderInCategory="180"
-        android:title="Settings"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/act_about"
-        android:orderInCategory="200"
-        android:title="About"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/act_viewType"
-        android:title="Change View Type"
-        android:orderInCategory="100"
-        />
+
 
 </menu>

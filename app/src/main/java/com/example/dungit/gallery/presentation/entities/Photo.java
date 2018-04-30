@@ -18,6 +18,7 @@ public class Photo implements Serializable {
     private String dateTaken;
     private long albumId;
     private String albumName;
+    private long dateTakenNumber;
     private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     private File file;
     private String nameImg;
@@ -32,20 +33,23 @@ public class Photo implements Serializable {
         this.albumId = albumId;
         this.albumName = albumName;
         this.pathUrl = Uri.withAppendedPath(EXTERNAL_URI, Long.toString(idImg)).toString();
+
     }
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file) {
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber) {
         this(idImg, dateTaken, albumId, albumName);
         this.file = file;
+        this.dateTakenNumber = dataTakenNumber;
     }
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file,String nameImg, String sizeImg , String resoluImg ,String pathImg) {
-        this(idImg, dateTaken, albumId, albumName,file);
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber,String nameImg, String sizeImg , String resoluImg ,String pathImg) {
+        this(idImg, dateTaken, albumId, albumName,file,dataTakenNumber);
         this.nameImg = nameImg;
         this.sizeImg = sizeImg;
         this.resoluImg = resoluImg;
         this.pathImg = pathImg;
     }
+
 
     protected Photo(Parcel in) {
         idImg = in.readLong();
@@ -102,6 +106,10 @@ public class Photo implements Serializable {
         this.file = file;
     }
 
+    public long getDateTakenNumber() {
+        return dateTakenNumber;
+    }
+
     public String getNameImg() {
         return nameImg;
     }
@@ -117,4 +125,5 @@ public class Photo implements Serializable {
     public String getPathImg() {
         return pathImg;
     }
+
 }

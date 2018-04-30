@@ -28,17 +28,22 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.MyAppGlideModule;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by DUNGIT on 4/18/2018.
  */
 
-public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Filterable {
+public class AdapterInnerRecyclerView
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer,Filterable {
+
 
     private ArrayList<Photo> data;
     private ArrayList<Photo> mFilterdata;
@@ -51,6 +56,10 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
         this.data = data;
         this.mFilterdata =data;
         this.context = context;
+    }
+
+    public void setData(ArrayList<Photo> data) {
+        this.data = data;
     }
 
     @NonNull
@@ -66,8 +75,8 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
                     parent, false);
         }
         return new InnerViewHolder(view);
-    }
 
+    }
 
 
     @Override
@@ -88,7 +97,7 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
                 int imgPostion = 0;
                 if(context instanceof  MainActivity ){
                     MainActivity mainActivity = (MainActivity) context;
-                    ArrayList<Photo> photos = mainActivity.getArrListPhoto();
+                    ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
                     if(data != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(data.get(position));
@@ -114,6 +123,20 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
         });
     }
 
+    @Override
+    public int getItemCount() {
+        return mFilterdata.size();
+    }
+    @Override
+    public void update(Observable observable, Object o) {
+        if(observable instanceof DBHelper){
+            DBHelper dbHelper = (DBHelper)observable;
+            this.mFilterdata = dbHelper.getListPhoto();
+            this.notifyDataSetChanged();
+        }
+    }
+
+    // Ham danh cho Filter va ViewType
 
     @Override
     public int getItemViewType(int position) {
@@ -133,7 +156,6 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
         isSwitchView = !isSwitchView;
         return isSwitchView;
     }
-
 
     @Override
     public Filter getFilter() {
@@ -165,11 +187,6 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
                 notifyDataSetChanged();
             }
         };
-    }
-
-    @Override
-    public int getItemCount() {
-        return mFilterdata.size();
     }
 
 

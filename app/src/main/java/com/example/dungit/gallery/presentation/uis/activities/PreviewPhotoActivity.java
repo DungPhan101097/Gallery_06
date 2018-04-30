@@ -53,12 +53,10 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
     private static ViewPager mPager;
     private static int currentPage = 0;
-    private PhotoSlideAdapter adpPhotoSlide;
 
     private static ArrayList<Photo> photos = null;
     private BottomNavigationView bNV = null;
     private Toolbar toolbar = null;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,22 +69,21 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (photos != null && intent != null) {
-            currentPage= intent.getIntExtra(IMG_POSITION,0);
-            final Toolbar toolbar = findViewById(R.id.photo_toolbar_top);
+            currentPage = intent.getIntExtra(IMG_POSITION, 0);
+            toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
-            final BottomNavigationView bottomNavigationView= findViewById(R.id.bottom_navigation);
+            bNV = findViewById(R.id.bottom_navigation);
 
 
             mPager = findViewById(R.id.pager_photo);
-            adpPhotoSlide = new PhotoSlideAdapter(PreviewPhotoActivity.this,photos,toolbar,bottomNavigationView);
-            mPager.setAdapter(adpPhotoSlide);
+            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this, photos));
             mPager.setCurrentItem(currentPage);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
             ViewPager viewPager = findViewById(R.id.pager_photo);
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     final Photo photo = photos.get(position);
@@ -108,11 +105,30 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         }
     }
 
+    public BottomNavigationView getbNV() {
+        return bNV;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public static void setPhotos(ArrayList<Photo> photos) {
+        PreviewPhotoActivity.photos = photos;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_photo, menu);
+        getMenuInflater().inflate(R.menu.option_menu_previewphoto, menu);
         return  super.onCreateOptionsMenu(menu);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -141,7 +157,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 alertDialog.show();
             }break;
 
-            case R.id.act_setas:
+            case R.id.act_setAs:
             {
                 if(currentPage <0)
                     currentPage = 0;
@@ -152,7 +168,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 this.startActivity(Intent.createChooser(intent, "Set as:"));
             }break;
 
-            case R.id.act_openwith:
+            case R.id.act_openWith:
             {
                 if(currentPage <0)
                     currentPage = 0;
@@ -165,22 +181,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public static void setPhotos(ArrayList<Photo> photos) {
-        PreviewPhotoActivity.photos = photos;
-    }
-    public BottomNavigationView getbNV() {
-        return bNV;
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
     }
 
 }
