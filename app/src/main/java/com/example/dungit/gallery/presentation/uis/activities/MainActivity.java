@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
     private AlbumFragment albumFragment;
     private Toolbar toolbarTop;
 
-    private boolean isCheckedChangeView;
     private static final int MY_PERMISSION_EXTERNAL_STORAGE = 1;
 
     private DBHelper dbHelper;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dbHelper = new DBHelper(this);
-        isCheckedChangeView = false;
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -115,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
                 dbHelper.getListHiddenAlbums());
         lstFragment.add(pictureFragment);
         lstFragment.add(albumFragment);
-        //lstFragment.add(PictureFragment.newInstance(dbHelper.getListPhotoByDate()));
+
+
 
         viewPager = findViewById(R.id.viewpager);
         tabLayout = findViewById(R.id.tab_layout);
@@ -130,34 +130,7 @@ public class MainActivity extends AppCompatActivity implements MainCallback {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.act_change_view:
-                isCheckedChangeView = !isCheckedChangeView;
-                if (isCheckedChangeView) {
-                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
-                    pictureFragment.onChangeView(EMODE.MODE_GRID);
-                } else {
-                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
-                    pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
-
-                }
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public void onBackPressed() {
-
-
         if (viewPager.getCurrentItem() == 0) {
             super.onBackPressed();
         } else {

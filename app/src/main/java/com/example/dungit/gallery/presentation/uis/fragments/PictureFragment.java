@@ -7,6 +7,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,6 +33,8 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
     private ArrayList<Photo> lstPhoto;
     private EMODE mode;
+    private boolean isCheckedChangeView;
+
 
     private MainActivity main;
     private RecyclerView rvWrapper;
@@ -50,6 +55,7 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         main = (MainActivity) getActivity();
+        isCheckedChangeView = false;
         lstPhotoSameDate = (ArrayList<ListPhotoSameDate>) getArguments().getSerializable(KEY_LIST_PHOTO);
 
         lstPhoto = new ArrayList<>();
@@ -65,6 +71,7 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
 
         main.getDBHelper().addObserver(adapterInnerRecyclerView);
         main.getDBHelper().addObserver(adapterRecyclerView);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -113,4 +120,28 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         }
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_change_view:
+                isCheckedChangeView = !isCheckedChangeView;
+                if (isCheckedChangeView) {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+                    this.onChangeView(EMODE.MODE_GRID);
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
+                    this.onChangeView(EMODE.MODE_BY_DATE);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_picture, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 }
