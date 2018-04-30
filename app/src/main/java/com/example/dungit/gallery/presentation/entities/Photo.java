@@ -29,7 +29,6 @@ public class Photo implements Serializable {
         this.albumId = albumId;
         this.albumName = albumName;
         this.pathUrl = Uri.withAppendedPath(EXTERNAL_URI, Long.toString(idImg)).toString();
-
     }
 
     public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber) {
@@ -45,7 +44,6 @@ public class Photo implements Serializable {
         albumId = in.readLong();
         albumName = in.readString();
     }
-
 
 
     public long getIdImg() {

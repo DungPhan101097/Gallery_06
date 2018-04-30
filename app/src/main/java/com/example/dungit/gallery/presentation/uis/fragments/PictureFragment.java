@@ -20,28 +20,25 @@ import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
-import com.example.dungit.gallery.presentation.uis.callbacks.PictureFragCallback;
 
 import java.util.ArrayList;
 
 /**
  * Created by DUNGIT on 4/22/2018.
  */
-public class PictureFragment extends Fragment implements PictureFragCallback {
+public class PictureFragment extends Fragment {
     private static final String KEY_LIST_PHOTO = "list_photo";
-    private static final String KEY_MODE = "mode_preview_photo";
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
     private ArrayList<Photo> lstPhoto;
     private EMODE mode;
     private boolean isCheckedChangeView;
-
-
     private MainActivity main;
     private RecyclerView rvWrapper;
     private AdapterRecyclerView adapterRecyclerView;
     private AdapterInnerRecyclerView adapterInnerRecyclerView;
     private LinearLayoutManager linearLayoutManager;
     private GridLayoutManager gridLayoutManager;
+
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
         PictureFragment fragment = new PictureFragment();
@@ -88,7 +85,6 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
         return view;
     }
 
-    @Override
     public void onChangeView(EMODE mode) {
         this.mode = mode;
         switch (mode) {
@@ -102,24 +98,6 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
                 break;
         }
     }
-
-    @Override
-    public void onChangeDataView(ArrayList<ListPhotoSameDate> listPhotoByDate, ArrayList<Photo> lstPhoto) {
-        this.lstPhotoSameDate = listPhotoByDate;
-        this.lstPhoto = lstPhoto;
-        adapterRecyclerView.setData(this.lstPhotoSameDate);
-        adapterInnerRecyclerView.setData(this.lstPhoto);
-
-        switch (mode) {
-            case MODE_BY_DATE:
-                adapterRecyclerView.notifyDataSetChanged();
-                break;
-            case MODE_GRID:
-                adapterInnerRecyclerView.notifyDataSetChanged();
-                break;
-        }
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
