@@ -142,6 +142,9 @@ public class PictureFragment extends Fragment implements PictureFragCallback {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_picture, menu);
+        if(isCheckedChangeView){
+            menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 }

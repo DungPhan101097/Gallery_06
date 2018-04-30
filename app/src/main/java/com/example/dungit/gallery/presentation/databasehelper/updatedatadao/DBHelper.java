@@ -142,14 +142,12 @@ public class DBHelper extends Observable {
         convertListPhoto2ListPhotoSameDate(listPhoto);
     }
 
-    private void addListPhotoForReshowAlbum(List<Album> addedAlbum) {
-        for (Album album : addedAlbum) {
-            listPhoto.addAll(album.getArraylistPhoto());
-        }
+    private void addListPhotoForReshowAlbum(Album album) {
+        listPhoto.addAll(album.getArraylistPhoto());
         Collections.sort(listPhoto, new Comparator<Photo>() {
             @Override
             public int compare(Photo photo, Photo t1) {
-                long result =  (t1.getDateTakenNumber() - photo.getDateTakenNumber());
+                long result = (t1.getDateTakenNumber() - photo.getDateTakenNumber());
                 return result > 0 ? 1 : result < 0 ? -1 : 0;
             }
         });
@@ -244,7 +242,7 @@ public class DBHelper extends Observable {
         for (Album unhideAlbum : unhideAlbums_) {
             listAlbum.add(unhideAlbum);
             listHiddenAlbum.remove(unhideAlbum);
-            addListPhotoForReshowAlbum(unhideAlbums_);
+            addListPhotoForReshowAlbum(unhideAlbum);
             databaseHelper.removeHideAlbum(unhideAlbum.getId());
         }
         setChanged();
@@ -263,7 +261,7 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
-    public void moveAlbum(Album movedALbum, Album desAlbum){
+    public void moveAlbum(Album movedALbum, Album desAlbum) {
         File nAlbumFile = desAlbum.getFile();
 
         LinkedList<Photo> photos = movedALbum.getPhotos();
