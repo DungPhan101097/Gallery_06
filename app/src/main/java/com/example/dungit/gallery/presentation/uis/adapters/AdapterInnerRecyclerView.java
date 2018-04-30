@@ -25,17 +25,22 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.MyAppGlideModule;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by DUNGIT on 4/18/2018.
  */
 
-public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> {
+public class AdapterInnerRecyclerView
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer{
+
 
     private ArrayList<Photo> data;
     private Context context;
@@ -45,12 +50,17 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
         this.context = context;
     }
 
+    public void setData(ArrayList<Photo> data) {
+        this.data = data;
+    }
+
     @NonNull
     @Override
     public AdapterInnerRecyclerView.InnerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_img_item,
                 parent, false);
         return new InnerViewHolder(view);
+
     }
 
 
@@ -72,7 +82,7 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
                 int imgPostion = 0;
                 if(context instanceof  MainActivity ){
                     MainActivity mainActivity = (MainActivity) context;
-                    ArrayList<Photo> photos = mainActivity.getArrListPhoto();
+                    ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
                     if(data != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(data.get(position));
@@ -101,6 +111,15 @@ public  class AdapterInnerRecyclerView extends RecyclerView.Adapter<AdapterInner
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(observable instanceof DBHelper){
+            DBHelper dbHelper = (DBHelper)observable;
+            this.data = dbHelper.getListPhoto();
+            this.notifyDataSetChanged();
+        }
     }
 
     public static class InnerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,

@@ -11,16 +11,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.dungit.gallery.R;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by DUNGIT on 4/18/2018.
  */
 
-public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
+public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder>
+        implements Observer {
 
     private ArrayList<ListPhotoSameDate> data;
     private Context context;
@@ -28,6 +32,10 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     public AdapterRecyclerView(Context context, ArrayList<ListPhotoSameDate> data) {
         this.data = data;
         this.context = context;
+    }
+
+    public void setData(ArrayList<ListPhotoSameDate> data) {
+        this.data = data;
     }
 
     @NonNull
@@ -58,6 +66,16 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+       if(observable instanceof DBHelper){
+           DBHelper dbHelper = (DBHelper)observable;
+           this.data = dbHelper.getListPhotoByDate();
+           this.notifyDataSetChanged();
+
+       }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

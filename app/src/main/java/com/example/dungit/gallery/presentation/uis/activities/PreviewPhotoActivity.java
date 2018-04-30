@@ -2,6 +2,9 @@ package com.example.dungit.gallery.presentation.uis.activities;
 
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -54,6 +57,11 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static int currentPage = 0;
 
     private static ArrayList<Photo> photos = null;
+    private BottomNavigationView bNV = null;
+    private Toolbar toolbar = null;
+
+    AlertDialog dialog;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,27 +74,61 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (photos != null && intent != null) {
-            currentPage= intent.getIntExtra(IMG_POSITION,0);
-            final Toolbar toolbar = findViewById(R.id.photo_toolbar_top);
+            currentPage = intent.getIntExtra(IMG_POSITION, 0);
+            toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
-            final BottomNavigationView bottomNavigationView= findViewById(R.id.bottom_navigation);
-
-
+            bNV = findViewById(R.id.bottom_navigation);
 
             mPager = findViewById(R.id.pager_photo);
-            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this,photos,toolbar,bottomNavigationView));
+            mPager.setAdapter(new PhotoSlideAdapter(PreviewPhotoActivity.this, photos));
             mPager.setCurrentItem(currentPage);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+            final ViewPager viewPager = findViewById(R.id.pager_photo);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    final Photo photo = photos.get(position);
+                    String name = photo.getFile().getName();
+                    getSupportActionBar().setTitle(name);
+                }
 
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public void onPageSelected(int position) {
+
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+
+
+            bNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
                     switch (item.getItemId()){
                         case R.id.photo_action_delete:{
-
+                            dialog = new AlertDialog.Builder(PreviewPhotoActivity.this).create();
+                            dialog.setTitle("Delete image?");
+                            dialog.setMessage("You sure?");
+                            dialog.setButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    startDelete();
+                                }
+                            });
+                            dialog.setButton2("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            dialog.show();
                             return true;
                         }
                         case R.id.photo_action_send:{
@@ -103,8 +145,25 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 }
             });
 
-
         }
+    }
+
+    public BottomNavigationView getbNV() {
+        return bNV;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public static void setPhotos(ArrayList<Photo> photos) {
+        PreviewPhotoActivity.photos = photos;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     public void startShare(){
@@ -118,15 +177,20 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(intent, "Share image via"));
     }
 
-
-    public static void setPhotos(ArrayList<Photo> photos) {
-        PreviewPhotoActivity.photos = photos;
+    public void startDelete(){
+        Photo cur = photos.get(currentPage);
+        File fileDelete = cur.getFile();
+        boolean bDelFile = fileDelete.delete();
+        if (bDelFile){
+            Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
+            refreshGallery(fileDelete);
+            return;
+        }
+        Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+    public void refreshGallery(File file){
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(file));
+        sendBroadcast(intent);
     }
-
 }

@@ -25,5 +25,4 @@
         app:elevation="2dp"
         app:srcCompat="@drawable/camera" />
 
-
 </android.support.design.widget.CoordinatorLayout>

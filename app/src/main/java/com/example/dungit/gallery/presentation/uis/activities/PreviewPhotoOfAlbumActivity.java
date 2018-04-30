@@ -24,7 +24,7 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity {
     private static final long ANIM_DURATION = 500;
     private RecyclerView rvWrapperPreviewLstPhoto;
     private ArrayList<Photo> lstPhoto;
-    private Toolbar toolbarTop;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,14 +32,14 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.preview_photo_of_album_layout);
 
         Intent intent = getIntent();
-        toolbarTop = findViewById(R.id.tb_top_album);
+        Toolbar toolbarTop = findViewById(R.id.tb_top_album);
         setSupportActionBar(toolbarTop);
 
         if(intent != null){
             AlbumFragment.AlbumExtendSerializable album =
                     (AlbumFragment.AlbumExtendSerializable) intent.getSerializableExtra(ALBUM_KEY);
             lstPhoto = album.getPhotos();
-            getActionBar().setTitle(album.getName());
+            getSupportActionBar().setTitle(album.getName());
         }
 
         rvWrapperPreviewLstPhoto = findViewById(R.id.rv_wrapper_preview_lst_photo);
