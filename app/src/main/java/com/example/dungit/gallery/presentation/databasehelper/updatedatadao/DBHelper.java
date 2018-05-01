@@ -3,6 +3,7 @@ package com.example.dungit.gallery.presentation.databasehelper.updatedatadao;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -39,13 +40,11 @@ public class DBHelper extends Observable {
     private static final String BUCKET_NAME = MediaStore.Images.Media.BUCKET_DISPLAY_NAME;
     private static final String DISPLAY_NAME = MediaStore.Images.Media.DISPLAY_NAME;
     private static final String SIZE = MediaStore.Images.Media.SIZE;
-    private static final String WIDTH = MediaStore.Images.Media.WIDTH;
-    private static final String HEIGHT = MediaStore.Images.Media.HEIGHT;
-
-    private static final String DATA = MediaStore.Images.Media.DATA;
+    private static final String DESCRIPTION = MediaStore.Images.Media.DESCRIPTION;
+    private static final String DATA = MediaStore.Images.Media.DATA;;
     private static final String[] IMAGE_PROJECTION_ALBUM =
             new String[]{
-                    ID, DATE_TAKEN, BUCKET_NAME, BUCKET_ID,DISPLAY_NAME,SIZE,WIDTH,HEIGHT, DATA
+                    ID, DATE_TAKEN, BUCKET_NAME,BUCKET_ID,DISPLAY_NAME,SIZE,DESCRIPTION, DATA
             };
     private static final String USER_ALBUM_FLODER
             = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Albums06/";
@@ -90,9 +89,8 @@ public class DBHelper extends Observable {
         final int albumIdIndex = imgCursor.getColumnIndex(BUCKET_ID);
         final int dataIndex = imgCursor.getColumnIndex(DATA);
         final int nameImage = imgCursor.getColumnIndex(DISPLAY_NAME);
-        final int widthImage = imgCursor.getColumnIndex(WIDTH);
-        final int heightImage = imgCursor.getColumnIndex(HEIGHT);
-        int sizeImage = imgCursor.getColumnIndex(SIZE);
+        final int sizeImage = imgCursor.getColumnIndex(SIZE);
+        final int descriptImage = imgCursor.getColumnIndex(DESCRIPTION);
 
         ListPhotoSameDate lstPhoto = null;
         String date = null;
@@ -106,15 +104,24 @@ public class DBHelper extends Observable {
             final String albumName = imgCursor.getString(albumNameIndex);
             final long albumId = imgCursor.getLong(albumIdIndex);
             final String nameImg = imgCursor.getString(nameImage);
-            final String resoluImg  = imgCursor.getString(widthImage) + "x"+imgCursor.getString(heightImage);
             final String sizeImg = Integer.toString(Integer.parseInt(imgCursor.getString(sizeImage))/1024)+"(KB)";
             final String filePath = imgCursor.getString(dataIndex);
+            final String descriptImg = imgCursor.getString(descriptImage);
+            final String resoluImg;
 
             date = new Date(dateTaken).toString();
             date = date.substring(date.indexOf(" ") + 1, date.indexOf(" ") + 7) + " "
                     + date.substring(date.lastIndexOf(" ") + 1);
 
-            Photo curPhoto = new Photo(id, date, albumId, albumName, new File(filePath), dateTaken,nameImg,sizeImg,resoluImg,filePath);
+            //Lay kich thuoc anh resolution
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, options);
+            int width = options.outWidth;
+            int height = options.outHeight;
+            resoluImg=Integer.toString(width)+"x"+Integer.toString(height);
+
+            Photo curPhoto = new Photo(id, date, albumId, albumName, new File(filePath), dateTaken,nameImg,sizeImg,resoluImg,filePath,descriptImg);
             listPhoto.add(curPhoto);
 
             if (albumMap.containsKey(albumId)) {

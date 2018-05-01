@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.entities.EMODE;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 /**
  * Created by DUNGIT on 4/22/2018.
  */
-public class PictureFragment extends Fragment implements PictureFragCallback,SearchView.OnQueryTextListener{
+public class PictureFragment extends Fragment implements PictureFragCallback ,SearchView.OnQueryTextListener{
     private static final String KEY_LIST_PHOTO = "list_photo";
     private static final String KEY_MODE = "mode_preview_photo";
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
@@ -43,6 +44,8 @@ public class PictureFragment extends Fragment implements PictureFragCallback,Sea
     private LinearLayoutManager linearLayoutManager;
     private GridLayoutManager gridLayoutManager;
     private boolean gridMode=false;
+
+    SearchView searchView;
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
         PictureFragment fragment = new PictureFragment();
@@ -74,27 +77,6 @@ public class PictureFragment extends Fragment implements PictureFragCallback,Sea
         setHasOptionsMenu(true);
     }
 
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.option_menu_picture, menu);
-        final MenuItem item = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setOnQueryTextListener(this);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.act_viewType:
-                onChangeViewType();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -115,17 +97,19 @@ public class PictureFragment extends Fragment implements PictureFragCallback,Sea
         switch (mode) {
             case MODE_BY_DATE:
                 gridMode=false;
+                searchView.setQueryHint("Tìm kiếm theo ngày tháng năm");
                 rvWrapper.setLayoutManager(linearLayoutManager);
                 rvWrapper.setAdapter(adapterRecyclerView);
                 break;
             case MODE_GRID:
                 gridMode=true;
+                searchView.setQueryHint("Tìm kiếm theo tên");
                 boolean isSwitched = adapterRecyclerView.getViewType();
                 if(isSwitched)
                     rvWrapper.setLayoutManager(gridLayoutManager);
                 else
                     rvWrapper.setLayoutManager(linearLayoutManager);
-                    rvWrapper.setAdapter(adapterInnerRecyclerView);
+                rvWrapper.setAdapter(adapterInnerRecyclerView);
                 break;
         }
     }
@@ -145,6 +129,32 @@ public class PictureFragment extends Fragment implements PictureFragCallback,Sea
                 adapterInnerRecyclerView.notifyDataSetChanged();
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.option_menu_picture, menu);
+        final MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+        if(gridMode) {
+
+        }
+        else {
+            searchView.setQueryHint("Tìm kiếm theo ngày");
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_viewType:
+                onChangeViewType();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     //Ham cho changeviewtype
@@ -173,10 +183,12 @@ public class PictureFragment extends Fragment implements PictureFragCallback,Sea
     @Override
     public boolean onQueryTextChange(String newText) {
         String text = newText;
-        if(gridMode)
+        if(gridMode) {
             adapterInnerRecyclerView.getFilter().filter(newText);
-        else
+        }
+        else {
             adapterRecyclerView.getFilter().filter(newText);
+        }
         return false;
     }
 

@@ -25,6 +25,7 @@ public class Photo implements Serializable {
     private String sizeImg;
     private String resoluImg;
     private String pathImg;
+    private String descriptImg;
 
 
     public Photo(long idImg, String dateTaken, long albumId, String albumName) {
@@ -42,12 +43,13 @@ public class Photo implements Serializable {
         this.dateTakenNumber = dataTakenNumber;
     }
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber,String nameImg, String sizeImg , String resoluImg ,String pathImg) {
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber,String nameImg, String sizeImg , String resoluImg ,String pathImg,String descriptImg) {
         this(idImg, dateTaken, albumId, albumName,file,dataTakenNumber);
         this.nameImg = nameImg;
         this.sizeImg = sizeImg;
         this.resoluImg = resoluImg;
         this.pathImg = pathImg;
+        this.descriptImg =descriptImg;
     }
 
 
@@ -109,7 +111,6 @@ public class Photo implements Serializable {
     public long getDateTakenNumber() {
         return dateTakenNumber;
     }
-
     public String getNameImg() {
         return nameImg;
     }
@@ -124,6 +125,13 @@ public class Photo implements Serializable {
 
     public String getPathImg() {
         return pathImg;
+    }
+
+    public String getDescriptImg() {
+        return descriptImg;
+    }
+    public void setDescriptImg(String descriptImg) {
+        this.descriptImg = descriptImg;
     }
 
 }

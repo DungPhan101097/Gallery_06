@@ -29,19 +29,11 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private ArrayList<Photo> images;
     private LayoutInflater inflater;
     private Context context;
-    private Toolbar toolbar;
-    private BottomNavigationView bottomNavigationView;
-    private boolean isShowTB = true;
 
     public PhotoSlideAdapter(Context context, ArrayList<Photo> images) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
-        if(context instanceof  PreviewPhotoActivity) {
-            PreviewPhotoActivity ppA = (PreviewPhotoActivity)context;
-            this.toolbar = ppA.getToolbar();
-            this.bottomNavigationView = ppA.getbNV();
-        }
     }
 
     @Override
@@ -69,7 +61,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         myImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toogleShowTB();
+                onInnerViewClick(v);
             }
         });
 
@@ -77,24 +69,16 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         return myImageLayout;
     }
 
-    private void toogleShowTB(){
-        if (toolbar != null && bottomNavigationView != null) {
-            if (isShowTB) {
 
-                toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-                bottomNavigationView.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-            } else {
-                toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
-                bottomNavigationView.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
-            }
-            isShowTB = !isShowTB;
-        }
-    }
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
     }
 
+
+    public void onInnerViewClick(View v){
+
+    }
 
 }

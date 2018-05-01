@@ -46,8 +46,8 @@ public class AdapterInnerRecyclerView
 
 
     private ArrayList<Photo> data;
-    private ArrayList<Photo> mFilterdata;
     private Context context;
+    private ArrayList<Photo> mFilterdata;
     private static final int LIST_ITEM = 1;
     private static final int GRID_ITEM = 0;
     private static boolean isSwitchView = true;
@@ -95,25 +95,20 @@ public class AdapterInnerRecyclerView
             public void onClick(View view, int position) {
                 Intent intent = new Intent(context, PreviewPhotoActivity.class);
                 int imgPostion = 0;
-                if(context instanceof  MainActivity ){
+                if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
-                    if(mFilterdata != photos) {
+                    if (mFilterdata != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(mFilterdata.get(position));
                         imgPostion = imgPostion >= 0 ? imgPostion : 0;
                     }
-                }else{
+                } else {
                     PreviewPhotoActivity.setPhotos(mFilterdata);
-                    imgPostion=position;
+                    imgPostion = position;
                 }
-                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
-                try {
-                    context.startActivity(intent);
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION, imgPostion);
+                context.startActivity(intent);
             }
 
             @Override
@@ -127,14 +122,16 @@ public class AdapterInnerRecyclerView
     public int getItemCount() {
         return mFilterdata.size();
     }
+
     @Override
     public void update(Observable observable, Object o) {
-        if(observable instanceof DBHelper){
-            DBHelper dbHelper = (DBHelper)observable;
+        if (observable instanceof DBHelper) {
+            DBHelper dbHelper = (DBHelper) observable;
             this.mFilterdata = dbHelper.getListPhoto();
             this.notifyDataSetChanged();
         }
     }
+
 
     // Ham danh cho Filter va ViewType
 
@@ -190,11 +187,12 @@ public class AdapterInnerRecyclerView
     }
 
 
+
     public static class InnerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnLongClickListener {
         private ImageView ivItem;
-        private TextView txtNAme;
         private ItemClickListener itemClickListener;
+        private TextView txtNAme;
 
         public InnerViewHolder(View itemView) {
             super(itemView);

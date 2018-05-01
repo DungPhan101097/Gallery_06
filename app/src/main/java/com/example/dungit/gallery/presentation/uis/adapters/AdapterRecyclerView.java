@@ -30,8 +30,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         implements Observer,Filterable {
 
     private ArrayList<ListPhotoSameDate> data;
-    private ArrayList<ListPhotoSameDate> mFilterdata;
     private Context context;
+
+    private ArrayList<ListPhotoSameDate> mFilterdata;
     private AdapterInnerRecyclerView adpInner;
     private ArrayList<ViewHolder> arr_viewholder= new ArrayList<>();
     private ArrayList<AdapterInnerRecyclerView> arr_adpInner = new ArrayList<>();
@@ -40,10 +41,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
     public AdapterRecyclerView(Context context, ArrayList<ListPhotoSameDate> data) {
         this.data = data;
-        this.mFilterdata =data;
         this.context = context;
+        this.mFilterdata =data;
     }
-
 
     public void setData(ArrayList<ListPhotoSameDate> data) {
         this.data = data;
@@ -93,7 +93,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
        }
     }
 
-  // Ham danh cho Filter va ViewType
+    // Ham danh cho Filter va ViewType
 
     public void NotifyChange()
     {
