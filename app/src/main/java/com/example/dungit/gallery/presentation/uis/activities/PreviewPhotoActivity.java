@@ -109,11 +109,11 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     final Photo photo = photos.get(position);
                     String name = photo.getFile().getName();
                     getSupportActionBar().setTitle(name);
-                    if(photos.get(currentPage).getDescriptImg()==null)
+                    if(photos.get(position).getDescriptImg()==null)
                         txtDes.setVisibility(View.INVISIBLE);
                     else
                         txtDes.setVisibility(View.VISIBLE);
-                    txtDes.setText(photos.get(currentPage).getDescriptImg());
+                    txtDes.setText(photos.get(position).getDescriptImg());
                     currentPage = position;
                 }
 
