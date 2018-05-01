@@ -6,8 +6,10 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -15,15 +17,18 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.support.v7.widget.Toolbar;
+import android.widget.Scroller;
 
 import com.example.dungit.gallery.R;
-import com.example.dungit.gallery.presentation.uis.animation.FadePageTransformer;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.PhotoSlideAdapter;
+import com.example.dungit.gallery.presentation.uis.animation.FixedSpeedScroller;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import static com.example.dungit.gallery.presentation.Utils.MenuUtils.removeShiftMode;
+import static com.example.dungit.gallery.presentation.Utils.MenuUtils.setScroller;
 
 /**
  * Created by DUNGIT on 4/23/2018.
@@ -34,23 +39,25 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     public static final String IMG_POSITION = "img_postion_key";
 
     private ViewPager mPager;
-    private static int currentPage = 0;
+    private int currentPage = 0;
 
-    private static ArrayList<Photo> photos = null;
     private BottomNavigationView bNV = null;
     private Toolbar toolbar = null;
 
-    private static int slideShowDelay= 5000;
-    private static boolean isSlideRunning = false;
-    private static boolean isShowTB = true;
+    private boolean isSlideRunning = false;
+    private boolean isShowTB = true;
+    private Scroller defaultScroller;
+    private Scroller slideShowScoller;
 
+    private static ArrayList<Photo> photos = null;
+    private static int slideShowDelay= 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
-    private static ViewPager.PageTransformer slideShowAnimation = new FadePageTransformer();
+    //private static ViewPager.PageTransformer slideShowAnimation = new FadePageTransformer();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_photo_slide_test);
+        setContentView(R.layout.view_photo_slide);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -59,6 +66,10 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (photos != null && intent != null) {
             currentPage = intent.getIntExtra(IMG_POSITION, 0);
+
+            defaultScroller = new Scroller(this);
+            slideShowScoller =new FixedSpeedScroller(this);
+
             toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
             bNV = findViewById(R.id.bottom_navigation);
@@ -83,19 +94,18 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-            ViewPager viewPager = findViewById(R.id.pager_photo);
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     final Photo photo = photos.get(position);
                     String name = photo.getFile().getName();
                     getSupportActionBar().setTitle(name);
-                    currentPage = position;
                 }
 
                 @Override
                 public void onPageSelected(int position) {
-
+                    currentPage = position;
+                    Log.i("Curent Page:",String.valueOf(currentPage));
                 }
 
                 @Override
@@ -120,20 +130,22 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     return false;
                 }
             });
+
+
         }
     }
 
     private void startSlideShow(){
-        mPager.setPageTransformer(false
-                , slideShowAnimation);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setScroller(mPager,slideShowScoller,this);
         handler.postDelayed(slideShow,slideShowDelay);
         hideTB();
         isSlideRunning = true;
     }
 
     private void stopSlideShow(){
-        mPager.setPageTransformer(false
-                , slideAnimation);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setScroller(mPager,defaultScroller,this);
         handler.removeCallbacks(slideShow);
         showTB();
         isSlideRunning = false;
@@ -166,10 +178,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if (handler!= null) {
-            handler.removeCallbacks(slideShow);
-            isSlideRunning = false;
-        }
+        stopSlideShow();
     }
 
     public void toogleShowTB(){
@@ -213,4 +222,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     public static void setSlideAnimation(ViewPager.PageTransformer slideAnimation) {
         PreviewPhotoActivity.slideAnimation = slideAnimation;
     }
+
+
 }

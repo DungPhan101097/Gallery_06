@@ -34,6 +34,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
+
     }
 
     @Override
@@ -64,8 +65,8 @@ public class PhotoSlideAdapter  extends PagerAdapter{
                 onInnerViewClick(v);
             }
         });
-
-        view.addView(myImageLayout,0);
+        Log.i("Postion: ",String.valueOf(position) + " "+photo.getFile());
+        view.addView(myImageLayout);
         return myImageLayout;
     }
 

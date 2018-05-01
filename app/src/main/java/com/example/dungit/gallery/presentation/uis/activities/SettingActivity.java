@@ -21,7 +21,7 @@ public class SettingActivity extends AppCompatActivity {
     RadioButton rbFade;
 
     RadioGroup rgSlideTime;
-    RadioButton rb2s;
+    RadioButton rb3s;
     RadioButton rb5s;
     RadioButton rb10s;
 
@@ -38,10 +38,10 @@ public class SettingActivity extends AppCompatActivity {
         rbDefault = findViewById(R.id.rbDefault);
         rbZoom = findViewById(R.id.rbZoom);
         rbDepth = findViewById(R.id.rbDepth);
-        rbDepth = findViewById(R.id.rbFade);
+        rbFade = findViewById(R.id.rbFade);
 
         rgSlideTime = findViewById(R.id.rgSlideTime);
-        rb2s = findViewById(R.id.rb2s);
+        rb3s = findViewById(R.id.rb3s);
         rb5s = findViewById(R.id.rb5s);
         rb10s = findViewById(R.id.rb10s);
 
@@ -50,8 +50,8 @@ public class SettingActivity extends AppCompatActivity {
         ViewPager.PageTransformer animation = PreviewPhotoActivity.getSlideAnimation();
 
         switch (slideShowDelay) {
-            case 2000:
-                rb2s.setChecked(true);
+            case 3000:
+                rb3s.setChecked(true);
                 break;
             case 10000:
                 rb10s.setChecked(true);
@@ -94,8 +94,8 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
-                    case R.id.rb2s:
-                        PreviewPhotoActivity.setSlideShowDelay(2000);
+                    case R.id.rb3s:
+                        PreviewPhotoActivity.setSlideShowDelay(3000);
                         break;
                     case R.id.rb10s:
                         PreviewPhotoActivity.setSlideShowDelay(10000);
