@@ -103,11 +103,11 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     }
     public boolean toggle()
     {
-        return adpInner.toggleItemViewType();
+        isGrid =adpInner.toggleItemViewType();
+        return isGrid;
     }
     public void setLayout(boolean isSwitched)
     {
-        isGrid = isSwitched;
         for(int i=0;i<arr_viewholder.size();i++)
             arr_viewholder.get(i).rvItem.setLayoutManager(isSwitched ? new GridLayoutManager(context, 4):new LinearLayoutManager(context));
     }
@@ -115,6 +115,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     {
         return adpInner.getViewType();
     }
+
 
     @Override
     public Filter getFilter() {

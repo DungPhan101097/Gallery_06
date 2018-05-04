@@ -219,7 +219,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             {
                 if(currentPage <0)
                     currentPage = 0;
-
                 final EditText edittext = new EditText(this);
                 AlertDialog.Builder alert=new AlertDialog.Builder(this);;
                 alert.setTitle("Đặt chú thích ảnh");

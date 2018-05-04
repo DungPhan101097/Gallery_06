@@ -51,6 +51,7 @@ public class AdapterInnerRecyclerView
     private static final int LIST_ITEM = 1;
     private static final int GRID_ITEM = 0;
     private static boolean isSwitchView = true;
+    private static boolean isSwitchView_backup = true;
 
     public AdapterInnerRecyclerView(Context context, ArrayList<Photo> data) {
         this.data = data;
@@ -156,7 +157,19 @@ public class AdapterInnerRecyclerView
     }
     public boolean toggleItemViewType () {
         isSwitchView = !isSwitchView;
+        isSwitchView_backup = isSwitchView;
         return isSwitchView;
+    }
+    public boolean toggleItemViewTypeByPreview()
+    {
+        isSwitchView_backup = isSwitchView;
+        isSwitchView = !isSwitchView;
+        return isSwitchView;
+    }
+
+    public void setbackViewType()
+    {
+        isSwitchView = isSwitchView_backup;
     }
 
     @Override
