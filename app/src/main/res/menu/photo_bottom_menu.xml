@@ -7,6 +7,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_delete"
         android:title="Delete"
+        app:showAsAction="ifRoom"
         />
 
     <item
@@ -14,6 +15,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_send"
         android:title="Send"
+        app:showAsAction="ifRoom"
         />
 
     <item
@@ -21,12 +23,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_edit"
         android:title="Edit"
+        app:showAsAction="ifRoom"
         />
 
-    <item
-        android:id="@+id/photo_action_slideshow"
-        android:enabled="true"
-        android:icon="@drawable/ic_slideshow"
-        android:title="Slideshow"
-        />
 </menu>

@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://F:\PROJECT\Android\Gallery_06-BAOFinal\Gallery_06-BAO-2\Gallery_06.iml" filepath="F:\PROJECT\Android\Gallery_06-BAOFinal\Gallery_06-BAO-2\Gallery_06.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Gallery_06-BAO-2.iml" filepath="$PROJECT_DIR$/Gallery_06-BAO-2.iml" />
+      <module fileurl="file://F:\PROJECT\Android\Gallery_06-master(5)final\Gallery_06-master\Gallery_06.iml" filepath="F:\PROJECT\Android\Gallery_06-master(5)final\Gallery_06-master\Gallery_06.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gallery_06-master.iml" filepath="$PROJECT_DIR$/Gallery_06-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://F:\PROJECT\Android\Gallery_06-BAOFinal\Gallery_06-BAO-2\app\app.iml" filepath="F:\PROJECT\Android\Gallery_06-BAOFinal\Gallery_06-BAO-2\app\app.iml" />
     </modules>
   </component>
 </project>

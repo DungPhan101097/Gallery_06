@@ -12,6 +12,10 @@
         android:id="@+id/rv_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+        android:scrollbarSize="@dimen/scrollbar_size"
+        android:scrollbarStyle="outsideOverlay"
+        />
 
 </LinearLayout>

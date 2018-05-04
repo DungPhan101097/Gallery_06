@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="scrollbar_size">12dp</dimen>
+</resources>

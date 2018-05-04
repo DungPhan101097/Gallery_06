@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -21,6 +22,7 @@ import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
@@ -29,11 +31,21 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private ArrayList<Photo> images;
     private LayoutInflater inflater;
     private Context context;
+    private Toolbar toolbar;
+    private TextView txtDes;
+    private BottomNavigationView bottomNavigationView;
+    private boolean isShowTB = true;
 
     public PhotoSlideAdapter(Context context, ArrayList<Photo> images) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
+        if(context instanceof  PreviewPhotoActivity) {
+            PreviewPhotoActivity ppA = (PreviewPhotoActivity)context;
+            this.toolbar = ppA.getToolbar();
+            this.bottomNavigationView = ppA.getbNV();
+            this.txtDes = ppA.getTextDescip();
+        }
     }
 
     @Override
@@ -50,7 +62,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     public Object instantiateItem(final ViewGroup view, int position) {
         View myImageLayout = inflater.inflate(R.layout.preview_photo_layout, view, false);
         final Photo photo=images.get(position);
-        ImageView myImage = myImageLayout
+        PhotoView myImage = myImageLayout
                 .findViewById(R.id.im_preview_photo);
 
         GlideApp.with(context).load(photo.getUrl())
@@ -61,7 +73,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         myImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onInnerViewClick(v);
+                toogleShowTB();
             }
         });
 
@@ -69,16 +81,26 @@ public class PhotoSlideAdapter  extends PagerAdapter{
         return myImageLayout;
     }
 
+    private void toogleShowTB(){
+        if (toolbar != null && bottomNavigationView != null) {
+            if (isShowTB) {
 
+                toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+                bottomNavigationView.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+                txtDes.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+            } else {
+                toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+                bottomNavigationView.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+                txtDes.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+            }
+            isShowTB = !isShowTB;
+        }
+    }
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
     }
 
-
-    public void onInnerViewClick(View v){
-
-    }
 
 }

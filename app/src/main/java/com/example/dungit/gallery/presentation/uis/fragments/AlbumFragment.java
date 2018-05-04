@@ -185,14 +185,12 @@ public class AlbumFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.albumDelete:
                 albumController.deleteAlbum(album);
-                main.onUpdateListPhotoWhenDelOrHideAlbum(album);
                 break;
             case R.id.albumRename:
                 albumController.renameAlbum(album);
                 break;
             case R.id.albumHide:
                 albumController.hideAlbum(album);
-                main.onUpdateListPhotoWhenDelOrHideAlbum(album);
                 break;
             case R.id.albumMove:
                 albumController.moveAlbum(album);

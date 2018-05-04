@@ -24,9 +24,8 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity {
     public static final String ALBUM_KEY = "album_key";
     private static final long ANIM_DURATION = 500;
     private RecyclerView rvWrapperPreviewLstPhoto;
-    private AdapterInnerRecyclerView adapterInnerRecyclerView;
     private ArrayList<Photo> lstPhoto;
-
+    private AdapterInnerRecyclerView adapterInnerRecyclerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,10 +42,10 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity {
             lstPhoto = album.getPhotos();
             getSupportActionBar().setTitle(album.getName());
         }
+
         adapterInnerRecyclerView = new  AdapterInnerRecyclerView(this, lstPhoto);
         rvWrapperPreviewLstPhoto = findViewById(R.id.rv_wrapper_preview_lst_photo);
         rvWrapperPreviewLstPhoto.setHasFixedSize(true);
-
         if(adapterInnerRecyclerView.getViewType())
             rvWrapperPreviewLstPhoto.setLayoutManager(new GridLayoutManager(this, 4));
         else

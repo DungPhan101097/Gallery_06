@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.entities.EMODE;
@@ -23,20 +22,18 @@ import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
-import com.example.dungit.gallery.presentation.uis.callbacks.PictureFragCallback;
 
 import java.util.ArrayList;
 
 /**
  * Created by DUNGIT on 4/22/2018.
  */
-public class PictureFragment extends Fragment implements PictureFragCallback ,SearchView.OnQueryTextListener{
+public class PictureFragment extends Fragment implements SearchView.OnQueryTextListener {
     private static final String KEY_LIST_PHOTO = "list_photo";
-    private static final String KEY_MODE = "mode_preview_photo";
     private ArrayList<ListPhotoSameDate> lstPhotoSameDate;
     private ArrayList<Photo> lstPhoto;
     private EMODE mode;
-
+    private boolean isCheckedChangeView;
     private MainActivity main;
     private RecyclerView rvWrapper;
     private AdapterRecyclerView adapterRecyclerView;
@@ -44,8 +41,8 @@ public class PictureFragment extends Fragment implements PictureFragCallback ,Se
     private LinearLayoutManager linearLayoutManager;
     private GridLayoutManager gridLayoutManager;
     private boolean gridMode=false;
-
     SearchView searchView;
+
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
         PictureFragment fragment = new PictureFragment();
@@ -59,6 +56,7 @@ public class PictureFragment extends Fragment implements PictureFragCallback ,Se
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         main = (MainActivity) getActivity();
+        isCheckedChangeView = false;
         lstPhotoSameDate = (ArrayList<ListPhotoSameDate>) getArguments().getSerializable(KEY_LIST_PHOTO);
 
         lstPhoto = new ArrayList<>();
@@ -91,7 +89,6 @@ public class PictureFragment extends Fragment implements PictureFragCallback ,Se
         return view;
     }
 
-    @Override
     public void onChangeView(EMODE mode) {
         this.mode = mode;
         switch (mode) {
@@ -115,47 +112,40 @@ public class PictureFragment extends Fragment implements PictureFragCallback ,Se
     }
 
     @Override
-    public void onChangeDataView(ArrayList<ListPhotoSameDate> listPhotoByDate, ArrayList<Photo> lstPhoto) {
-        this.lstPhotoSameDate = listPhotoByDate;
-        this.lstPhoto = lstPhoto;
-        adapterRecyclerView.setData(this.lstPhotoSameDate);
-        adapterInnerRecyclerView.setData(this.lstPhoto);
-
-        switch (mode) {
-            case MODE_BY_DATE:
-                adapterRecyclerView.notifyDataSetChanged();
-                break;
-            case MODE_GRID:
-                adapterInnerRecyclerView.notifyDataSetChanged();
-                break;
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.option_menu_picture, menu);
-        final MenuItem item = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setOnQueryTextListener(this);
-        if(gridMode) {
-
-        }
-        else {
-            searchView.setQueryHint("Tìm kiếm theo ngày");
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.act_change_view:
+                isCheckedChangeView = !isCheckedChangeView;
+                if (isCheckedChangeView) {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+                    this.onChangeView(EMODE.MODE_GRID);
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
+                    this.onChangeView(EMODE.MODE_BY_DATE);
+                }
+                break;
             case R.id.act_viewType:
                 onChangeViewType();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_picture, menu);
+        if(isCheckedChangeView){
+            menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+        }
+        final MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Tìm kiếm theo ngày tháng năm");
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
 
     //Ham cho changeviewtype
     public void onChangeViewType()
@@ -191,6 +181,5 @@ public class PictureFragment extends Fragment implements PictureFragCallback ,Se
         }
         return false;
     }
-
 
 }

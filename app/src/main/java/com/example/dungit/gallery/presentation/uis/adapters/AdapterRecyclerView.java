@@ -75,7 +75,6 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
         // }
 
         //holder.rvItem.setAdapter(holder.adapterInner);
-
     }
 
     @Override
@@ -92,6 +91,8 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
        }
     }
+
+
 
     // Ham danh cho Filter va ViewType
 
@@ -146,6 +147,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
             }
         };
     }
+
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
