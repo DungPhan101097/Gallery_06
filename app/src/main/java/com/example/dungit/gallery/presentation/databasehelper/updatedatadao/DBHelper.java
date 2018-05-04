@@ -257,6 +257,7 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
+    //add on 04/05/2018 (TOAN)
     public void reshowImg(Photo photo)
     {
         String idStr = String.valueOf(photo.getIdImg());
