@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +32,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private LayoutInflater inflater;
     private Context context;
     private Toolbar toolbar;
+    private TextView txtDes;
     private BottomNavigationView bottomNavigationView;
     private boolean isShowTB = true;
 
@@ -42,6 +44,7 @@ public class PhotoSlideAdapter  extends PagerAdapter{
             PreviewPhotoActivity ppA = (PreviewPhotoActivity)context;
             this.toolbar = ppA.getToolbar();
             this.bottomNavigationView = ppA.getbNV();
+            this.txtDes = ppA.getTextDescip();
         }
     }
 
@@ -84,9 +87,11 @@ public class PhotoSlideAdapter  extends PagerAdapter{
 
                 toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
                 bottomNavigationView.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+                txtDes.animate().translationY(bottomNavigationView.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
             } else {
                 toolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
                 bottomNavigationView.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
+                txtDes.animate().translationY(0).setInterpolator(new DecelerateInterpolator()).start();
             }
             isShowTB = !isShowTB;
         }

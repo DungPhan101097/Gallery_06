@@ -19,6 +19,15 @@
         app:titleTextColor="@color/black"
         />
 
+    <TextView
+        android:id="@+id/txtDes"
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
+        android:layout_gravity="bottom"
+        android:background="#5c7a7a7a"
+        android:text="Chú thích ảnh"
+        android:textColor="@android:color/black"
+        tools:layout_editor_absoluteY="474dp" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_navigation"

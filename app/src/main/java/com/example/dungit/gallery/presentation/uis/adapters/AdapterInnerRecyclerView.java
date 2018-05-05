@@ -15,8 +15,11 @@ import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -39,26 +42,39 @@ import java.util.Observer;
  */
 
 public class AdapterInnerRecyclerView
-        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer{
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer,Filterable {
 
 
     private ArrayList<Photo> data;
     private Context context;
+    private ArrayList<Photo> mFilterdata;
+    private static final int LIST_ITEM = 1;
+    private static final int GRID_ITEM = 0;
+    private static boolean isSwitchView = true;
+    private static boolean isSwitchView_backup = true;
 
     public AdapterInnerRecyclerView(Context context, ArrayList<Photo> data) {
         this.data = data;
+        this.mFilterdata =data;
         this.context = context;
     }
 
     public void setData(ArrayList<Photo> data) {
-        this.data = data;
+        this.mFilterdata = data;
     }
 
     @NonNull
     @Override
     public AdapterInnerRecyclerView.InnerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_img_item,
-                parent, false);
+        View view;
+        if(isSwitchView) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_img_item,
+                    parent, false);
+        }else
+        {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_img_item_list,
+                    parent, false);
+        }
         return new InnerViewHolder(view);
 
     }
@@ -66,7 +82,7 @@ public class AdapterInnerRecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull InnerViewHolder holder, int position) {
-        final Photo curPhoto = data.get(position);
+        final Photo curPhoto = mFilterdata.get(position);
 
         GlideApp.with(context).load(curPhoto.getUrl())
                 .placeholder(R.drawable.place_holder)
@@ -74,7 +90,7 @@ public class AdapterInnerRecyclerView
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
                 .into(holder.ivItem);
-
+        holder.txtNAme.setText(curPhoto.getNameImg());
         holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -83,13 +99,13 @@ public class AdapterInnerRecyclerView
                 if(context instanceof  MainActivity ){
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
-                    if(data != photos) {
+                    if(mFilterdata != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
-                        imgPostion = photos.indexOf(data.get(position));
+                        imgPostion = photos.indexOf(mFilterdata.get(position));
                         imgPostion = imgPostion >= 0 ? imgPostion : 0;
                     }
                 }else{
-                    PreviewPhotoActivity.setPhotos(data);
+                    PreviewPhotoActivity.setPhotos(mFilterdata);
                     imgPostion=position;
                 }
                 intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
@@ -110,27 +126,97 @@ public class AdapterInnerRecyclerView
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return mFilterdata.size();
     }
 
     @Override
     public void update(Observable observable, Object o) {
         if(observable instanceof DBHelper){
             DBHelper dbHelper = (DBHelper)observable;
-            this.data = dbHelper.getListPhoto();
+            this.mFilterdata = dbHelper.getListPhoto();
             this.notifyDataSetChanged();
         }
     }
+
+
+    // Ham danh cho Filter va ViewType
+
+    @Override
+    public int getItemViewType(int position) {
+        if(isSwitchView)
+        {
+            return GRID_ITEM;
+        }else
+        {
+            return LIST_ITEM;
+        }
+    }
+    public boolean getViewType()
+    {
+        return isSwitchView;
+    }
+    public boolean toggleItemViewType () {
+        isSwitchView = !isSwitchView;
+        isSwitchView_backup = isSwitchView;
+        return isSwitchView;
+    }
+    public boolean toggleItemViewTypeByPreview()
+    {
+        isSwitchView_backup = isSwitchView;
+        isSwitchView = !isSwitchView;
+        return isSwitchView;
+    }
+
+    public void setbackViewType()
+    {
+        isSwitchView = isSwitchView_backup;
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString= charSequence.toString();
+                if(charString.isEmpty())
+                {
+                    mFilterdata= data;
+                }else{
+                    ArrayList<Photo> filteredData = new ArrayList<>();
+                    for(Photo photo : data){
+                        if(photo.getNameImg().toLowerCase().contains(charString.toLowerCase()))
+                        {
+                            filteredData.add(photo);
+                        }
+                    }
+                    mFilterdata = filteredData;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterdata;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilterdata = (ArrayList<Photo>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+
+
 
     public static class InnerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
             View.OnLongClickListener {
         private ImageView ivItem;
         private ItemClickListener itemClickListener;
+        private TextView txtNAme;
 
         public InnerViewHolder(View itemView) {
             super(itemView);
             ivItem = itemView.findViewById(R.id.iv_item);
-
+            txtNAme = itemView.findViewById(R.id.txtName);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }

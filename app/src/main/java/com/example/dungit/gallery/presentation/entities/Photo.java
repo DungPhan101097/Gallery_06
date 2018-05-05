@@ -21,6 +21,11 @@ public class Photo implements Serializable {
     private long dateTakenNumber;
     private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     private File file;
+    private String nameImg;
+    private String sizeImg;
+    private String resoluImg;
+    private String pathImg;
+    private String descriptImg;
 
 
     public Photo(long idImg, String dateTaken, long albumId, String albumName) {
@@ -35,6 +40,15 @@ public class Photo implements Serializable {
         this(idImg, dateTaken, albumId, albumName);
         this.file = file;
         this.dateTakenNumber = dataTakenNumber;
+    }
+
+    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber,String nameImg, String sizeImg , String resoluImg ,String pathImg,String descriptImg) {
+        this(idImg, dateTaken, albumId, albumName,file,dataTakenNumber);
+        this.nameImg = nameImg;
+        this.sizeImg = sizeImg;
+        this.resoluImg = resoluImg;
+        this.pathImg = pathImg;
+        this.descriptImg =descriptImg;
     }
 
     protected Photo(Parcel in) {
@@ -93,6 +107,29 @@ public class Photo implements Serializable {
 
     public long getDateTakenNumber() {
         return dateTakenNumber;
+    }
+
+    public String getNameImg() {
+        return nameImg;
+    }
+
+    public String getSizeImg() {
+        return sizeImg;
+    }
+
+    public String getResoluImg() {
+        return resoluImg;
+    }
+
+    public String getPathImg() {
+        return pathImg;
+    }
+
+    public String getDescriptImg() {
+        return descriptImg;
+    }
+    public void setDescriptImg(String descriptImg) {
+        this.descriptImg = descriptImg;
     }
 
 }
