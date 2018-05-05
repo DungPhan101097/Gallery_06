@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class AlbumDatabaseHelper extends SQLiteOpenHelper {
+public class PhotoDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLite";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Album_Grallery_06";
 
     private static final String TABLE_BUCKET_NAME = "bucket_name";
@@ -20,8 +20,13 @@ public class AlbumDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_HIDE_ALBUM = "hide_bucket_id";
 
+    private static final String TABLE_PHOTO_DESCRIPTION = "photo_description_table";
+    private static final String PHOTO_ID = "photo_id";
+    private static final String PHOTO_DESCR = "photo_descr";
 
-    public AlbumDatabaseHelper(Context context) {
+
+
+    public PhotoDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -36,12 +41,16 @@ public class AlbumDatabaseHelper extends SQLiteOpenHelper {
                 + BUCKET_ID + " INTEGER PRIMARY KEY )";
         db.execSQL(script);
 
+        script = "CREATE TABLE " + TABLE_PHOTO_DESCRIPTION + "("
+                + PHOTO_ID + " INTEGER PRIMARY KEY," + PHOTO_DESCR + " TEXT)";
+        db.execSQL(script);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUCKET_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUCKET_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PHOTO_DESCRIPTION);
         onCreate(db);
     }
 
@@ -123,6 +132,32 @@ public class AlbumDatabaseHelper extends SQLiteOpenHelper {
         }catch (Exception ex){
             ex.printStackTrace();
         }
+        db.close();
+    }
+
+    public HashMap<Long,String> getPhotoDescriptionMap(){
+        HashMap<Long,String> map =new HashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor =db.rawQuery("select * from " + TABLE_PHOTO_DESCRIPTION,null);
+        if (cursor != null && cursor.moveToFirst()) {
+            map.put(cursor.getLong(0),cursor.getString(1));
+            while (cursor.moveToNext()){
+                map.put(cursor.getLong(0),cursor.getString(1));
+            }
+        }
+        cursor.close();
+        return map;
+    }
+
+    public void insertPhotoDescription(long id,String description){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_PHOTO_DESCRIPTION,PHOTO_ID + "= ? ",new String[]{
+                String.valueOf(id)
+        });
+        ContentValues values = new ContentValues();
+        values.put(PHOTO_ID, id);
+        values.put(PHOTO_DESCR, description);
+        db.insert(TABLE_PHOTO_DESCRIPTION, null, values);
         db.close();
     }
 }

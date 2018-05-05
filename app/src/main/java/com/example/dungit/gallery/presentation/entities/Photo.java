@@ -2,8 +2,10 @@ package com.example.dungit.gallery.presentation.entities;
 
 import android.net.Uri;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.MediaStore;
+
+import com.example.dungit.gallery.presentation.Utils.FileUtils;
+import com.example.dungit.gallery.presentation.Utils.ImageUtils;
 
 import java.io.File;
 import java.io.Serializable;
@@ -13,50 +15,34 @@ import java.io.Serializable;
  */
 
 public class Photo implements Serializable {
+    private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
     private long idImg;
     private String pathUrl;
-    private String dateTaken;
     private long albumId;
     private String albumName;
     private long dateTakenNumber;
-    private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     private File file;
-    private String nameImg;
-    private String sizeImg;
-    private String resoluImg;
-    private String pathImg;
+    private int width;
+    private int height;
     private String descriptImg;
 
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName) {
+    public Photo(long idImg, long dateTakenNumber, long albumId, String albumName, File file) {
         this.idImg = idImg;
-        this.dateTaken = dateTaken;
         this.albumId = albumId;
         this.albumName = albumName;
         this.pathUrl = Uri.withAppendedPath(EXTERNAL_URI, Long.toString(idImg)).toString();
-    }
-
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber) {
-        this(idImg, dateTaken, albumId, albumName);
+        this.dateTakenNumber = dateTakenNumber;
         this.file = file;
-        this.dateTakenNumber = dataTakenNumber;
     }
 
-    public Photo(long idImg, String dateTaken, long albumId, String albumName, File file, long dataTakenNumber,String nameImg, String sizeImg , String resoluImg ,String pathImg,String descriptImg) {
-        this(idImg, dateTaken, albumId, albumName,file,dataTakenNumber);
-        this.nameImg = nameImg;
-        this.sizeImg = sizeImg;
-        this.resoluImg = resoluImg;
-        this.pathImg = pathImg;
-        this.descriptImg =descriptImg;
-    }
-
-    protected Photo(Parcel in) {
-        idImg = in.readLong();
-        pathUrl = in.readString();
-        dateTaken = in.readString();
-        albumId = in.readLong();
-        albumName = in.readString();
+    public Photo(long idImg, long dataTakenNumber, long albumId, String albumName
+            , File file,int width ,int height, String descriptImg) {
+        this(idImg, dataTakenNumber, albumId, albumName, file);
+        this.width = width;
+        this.height = height;
+        this.descriptImg = descriptImg;
     }
 
 
@@ -69,11 +55,11 @@ public class Photo implements Serializable {
     }
 
     public String getDateTaken() {
-        return dateTaken;
+        return ImageUtils.getDate(dateTakenNumber);
     }
 
-    public void setDateTaken(String dateTaken) {
-        this.dateTaken = dateTaken;
+    public String getDetailDateTaken() {
+        return ImageUtils.getDetailDate(dateTakenNumber);
     }
 
     public long getAlbumId() {
@@ -110,24 +96,25 @@ public class Photo implements Serializable {
     }
 
     public String getNameImg() {
-        return nameImg;
+        return file.getName();
     }
 
     public String getSizeImg() {
-        return sizeImg;
+        return FileUtils.calculateSize(file.length());
     }
 
     public String getResoluImg() {
-        return resoluImg;
+        return String.valueOf(width) + "x" + String.valueOf(height);
     }
 
     public String getPathImg() {
-        return pathImg;
+        return file.getAbsolutePath();
     }
 
     public String getDescriptImg() {
         return descriptImg;
     }
+
     public void setDescriptImg(String descriptImg) {
         this.descriptImg = descriptImg;
     }

@@ -3,10 +3,7 @@ package com.example.dungit.gallery.presentation.controller;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -15,10 +12,9 @@ import android.widget.Toast;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.Utils.ImageFileFilter;
 import com.example.dungit.gallery.presentation.Utils.SortType;
-import com.example.dungit.gallery.presentation.databasehelper.AlbumDatabaseHelper;
+import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelper;
 import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Album;
-import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.AlbumAdapter;
 import com.example.dungit.gallery.presentation.uis.adapters.SelectAlbumAdapter;
 import com.example.dungit.gallery.presentation.uis.adapters.SelectHiddenAlbumAdapter;
@@ -45,13 +41,13 @@ public class AlbumController {
 
     private Context context;
     private AlbumAdapter albumAdapter;
-    private AlbumDatabaseHelper databaseHelper;
+    private PhotoDatabaseHelper databaseHelper;
     private DBHelper dbHelper;
 
 
     public AlbumController(Context context, AlbumAdapter albumAdapter, DBHelper dbHelper) {
         this.context = context;
-        databaseHelper = new AlbumDatabaseHelper(context);
+        databaseHelper = new PhotoDatabaseHelper(context);
         this.albumAdapter = albumAdapter;
         this.dbHelper = dbHelper;
     }

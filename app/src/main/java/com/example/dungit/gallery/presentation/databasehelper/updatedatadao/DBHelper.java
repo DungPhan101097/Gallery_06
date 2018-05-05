@@ -5,16 +5,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
 import com.example.dungit.gallery.presentation.Utils.EmptyFolderFileFilter;
-import com.example.dungit.gallery.presentation.databasehelper.AlbumDatabaseHelper;
+import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelper;
 import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
-import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -88,14 +86,12 @@ public class DBHelper extends Observable {
         final int albumNameIndex = imgCursor.getColumnIndex(BUCKET_NAME);
         final int albumIdIndex = imgCursor.getColumnIndex(BUCKET_ID);
         final int dataIndex = imgCursor.getColumnIndex(DATA);
-        final int nameImage = imgCursor.getColumnIndex(DISPLAY_NAME);
-        final int sizeImage = imgCursor.getColumnIndex(SIZE);
-        final int descriptImage = imgCursor.getColumnIndex(DESCRIPTION);
 
         ListPhotoSameDate lstPhoto = null;
         String date = null;
 
-
+        PhotoDatabaseHelper databaseHelper = new PhotoDatabaseHelper(context);
+        HashMap<Long,String> descriptionMap =databaseHelper.getPhotoDescriptionMap();
         HashMap<Long, LinkedList<Photo>> albumMap = new HashMap<>();
 
         while (imgCursor.moveToNext()) {
@@ -103,16 +99,8 @@ public class DBHelper extends Observable {
             final long dateTaken = imgCursor.getLong(dateIndex);
             final String albumName = imgCursor.getString(albumNameIndex);
             final long albumId = imgCursor.getLong(albumIdIndex);
-            final String nameImg = imgCursor.getString(nameImage);
-            final String sizeImg = Integer.toString(Integer.parseInt(imgCursor.getString(sizeImage))/1024)+"(KB)";
             final String filePath = imgCursor.getString(dataIndex);
-            final String descriptImg = imgCursor.getString(descriptImage);
-            final String resoluImg;
-
-            date = new Date(dateTaken).toString();
-            date = date.substring(date.indexOf(" ") + 1, date.indexOf(" ") + 7) + " "
-                    + date.substring(date.lastIndexOf(" ") + 1);
-
+            String descriptImg = null;
 
             //Lay kich thuoc anh resolution
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -120,9 +108,12 @@ public class DBHelper extends Observable {
             BitmapFactory.decodeFile(filePath, options);
             int width = options.outWidth;
             int height = options.outHeight;
-            resoluImg=Integer.toString(width)+"x"+Integer.toString(height);
 
-            Photo curPhoto = new Photo(id, date, albumId, albumName, new File(filePath), dateTaken,nameImg,sizeImg,resoluImg,filePath,descriptImg);
+            if(descriptionMap.containsKey(id)){
+                descriptImg = descriptionMap.get(id);
+            }
+
+            Photo curPhoto = new Photo(id, dateTaken, albumId, albumName, new File(filePath),width,height,descriptImg);
             listPhoto.add(curPhoto);
 
             if (albumMap.containsKey(albumId)) {
@@ -132,7 +123,6 @@ public class DBHelper extends Observable {
                 photos.add(curPhoto);
                 albumMap.put(albumId, photos);
             }
-
         }
         imgCursor.close();
         loadAlbums(albumMap);
@@ -174,7 +164,7 @@ public class DBHelper extends Observable {
 
     void loadAlbums(HashMap<Long, LinkedList<Photo>> albumMap) {
         Iterator<Long> it = albumMap.keySet().iterator();
-        AlbumDatabaseHelper databaseHelper = new AlbumDatabaseHelper(context);
+        PhotoDatabaseHelper databaseHelper = new PhotoDatabaseHelper(context);
         HashMap<Long, String> albumNames = databaseHelper.getAlbumNamesMap();
         HashSet<Long> hideids = databaseHelper.getHideBucketId();
         while (it.hasNext()) {
@@ -226,7 +216,7 @@ public class DBHelper extends Observable {
         }
     }
 
-    public void hideAlbum(Album album, AlbumDatabaseHelper databaseHelper) {
+    public void hideAlbum(Album album, PhotoDatabaseHelper databaseHelper) {
         databaseHelper.insertHideAlbum(album.getId());
         listHiddenAlbum.add(album);
         listAlbum.remove(album);
@@ -256,7 +246,7 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
-    public void reShowAlbum(List<Album> unhideAlbums_, AlbumDatabaseHelper databaseHelper) {
+    public void reShowAlbum(List<Album> unhideAlbums_, PhotoDatabaseHelper databaseHelper) {
         for (Album unhideAlbum : unhideAlbums_) {
             listAlbum.add(unhideAlbum);
             listHiddenAlbum.remove(unhideAlbum);
