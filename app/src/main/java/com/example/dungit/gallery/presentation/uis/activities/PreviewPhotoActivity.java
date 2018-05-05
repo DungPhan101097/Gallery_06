@@ -74,7 +74,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private Toolbar toolbar = null;
 
     String messDescript="";
-    private TextView txtDes;
+//    private TextView txtDes;
     private boolean isSlideRunning = false;
     private boolean isShowTB = true;
     private Scroller defaultScroller;
@@ -83,7 +83,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static ArrayList<Photo> photos = null;
     private static int slideShowDelay= 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
-    //private static ViewPager.PageTransformer slideShowAnimation = new FadePageTransformer();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +103,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             toolbar = findViewById(R.id.photo_toolbar_top);
             setSupportActionBar(toolbar);
             bNV = findViewById(R.id.bottom_navigation);
-            txtDes = findViewById(R.id.txtDes);
+            //txtDes = findViewById(R.id.txtDes);
             removeShiftMode(bNV);
             mPager = findViewById(R.id.pager_photo);
             PhotoSlideAdapter adapter = new PhotoSlideAdapter(PreviewPhotoActivity.this, photos){
@@ -130,12 +129,11 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     final Photo photo = photos.get(position);
                     String name = photo.getFile().getName();
                     getSupportActionBar().setTitle(name);
-                    currentPage = position;
-                    if(photos.get(position).getDescriptImg()==null)
-                        txtDes.setVisibility(View.INVISIBLE);
-                    else
-                        txtDes.setVisibility(View.VISIBLE);
-                    txtDes.setText(photos.get(position).getDescriptImg());
+//                    if(photos.get(position).getDescriptImg()==null)
+//                        txtDes.setVisibility(View.INVISIBLE);
+//                    else
+//                        txtDes.setVisibility(View.VISIBLE);
+//                    txtDes.setText(photos.get(position).getDescriptImg());
                 }
 
                 @Override
@@ -187,7 +185,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         isSlideRunning = false;
     }
 
-    public TextView getTextDescip(){return txtDes;}
+    //public TextView getTextDescip(){return txtDes;}
 
     public static void setPhotos(ArrayList<Photo> photos) {
         PreviewPhotoActivity.photos = photos;
@@ -285,8 +283,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                         values.put(MediaStore.Images.Media.DESCRIPTION,messDescript);
                         contentResolver.update(Image_URL,values,"_id=" + photos.get(currentPage).getIdImg(),null);
                         photos.get(currentPage).setDescriptImg(messDescript);
-                        txtDes.setText(messDescript);
-                        txtDes.setVisibility(View.VISIBLE);
+                        //txtDes.setText(messDescript);
+                       //zz txtDes.setVisibility(View.VISIBLE);
                         Toast.makeText(PreviewPhotoActivity.this, "Thay đổi thành công", Toast.LENGTH_SHORT).show();
                     }
                 });

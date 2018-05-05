@@ -1,6 +1,8 @@
 package com.example.dungit.gallery.presentation.uis.fragments;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -20,6 +22,7 @@ import com.example.dungit.gallery.presentation.entities.EMODE;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
+import com.example.dungit.gallery.presentation.uis.activities.SettingActivity;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
 
@@ -41,7 +44,7 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
     private LinearLayoutManager linearLayoutManager;
     private GridLayoutManager gridLayoutManager;
     private boolean gridMode=false;
-    SearchView searchView;
+    private SearchView searchView;
 
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
@@ -128,6 +131,11 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
             case R.id.act_viewType:
                 onChangeViewType();
                 break;
+            case R.id.action_settings:
+                Context context = main;
+                Intent intent = new Intent(context,SettingActivity.class);
+                context.startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -172,7 +180,6 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        String text = newText;
         if(gridMode) {
             adapterInnerRecyclerView.getFilter().filter(newText);
         }

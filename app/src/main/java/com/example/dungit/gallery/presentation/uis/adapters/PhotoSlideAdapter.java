@@ -1,27 +1,16 @@
 package com.example.dungit.gallery.presentation.uis.adapters;
 
 import android.content.Context;
-import android.net.Uri;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.GlideApp;
 import com.example.dungit.gallery.presentation.entities.Photo;
-import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
@@ -31,14 +20,12 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     private ArrayList<Photo> images;
     private LayoutInflater inflater;
     private Context context;
-	    private TextView txtDes;
 
 
     public PhotoSlideAdapter(Context context, ArrayList<Photo> images) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);
-		this.txtDes = ppA.getTextDescip();
     }
 
     @Override
@@ -63,12 +50,13 @@ public class PhotoSlideAdapter  extends PagerAdapter{
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(myImage);
 
-        myImageLayout.setOnClickListener(new View.OnClickListener() {
+        myImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onInnerViewClick(v);
             }
         });
+
         Log.i("Postion: ",String.valueOf(position) + " "+photo.getFile());
         view.addView(myImageLayout);
         return myImageLayout;

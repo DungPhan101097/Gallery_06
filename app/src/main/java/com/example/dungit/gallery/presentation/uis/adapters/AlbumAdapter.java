@@ -3,10 +3,13 @@ package com.example.dungit.gallery.presentation.uis.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,9 +24,9 @@ import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.viewholder.AlbumViewHolder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -32,17 +35,29 @@ import java.util.Observer;
  * Created by thaib on 17/04/2018.
  */
 
-public class AlbumAdapter extends ArrayAdapter implements Observer{
+public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
 
     private Context context;
     private List<Album> albums;
-    public static final File albumsLocation = new File(Environment.getExternalStorageDirectory(), "Albums06/");
+    private List<Album> mFilterdata;
 
     public AlbumAdapter(Context context, List<Album> albums) {
         super(context, R.layout.album_list_item, albums);
         this.context = context;
         this.albums = albums;
+        this.mFilterdata = albums;
 
+    }
+
+    @Override
+    public int getCount() {
+        return mFilterdata.size();
+    }
+
+    @Nullable
+    @Override
+    public Object getItem(int position) {
+        return mFilterdata.get(position);
     }
 
     @Override
@@ -61,7 +76,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer{
             myViewHolder = (AlbumViewHolder) row.getTag();
         }
 
-        Album album = albums.get(position);
+        Album album = mFilterdata.get(position);
         myViewHolder.txtNameAlbum.setText(album.getName());
         myViewHolder.txtItem.setText(String.valueOf(album.getSize()));
 
@@ -86,12 +101,6 @@ public class AlbumAdapter extends ArrayAdapter implements Observer{
                 return true;
         }
         return false;
-    }
-
-
-    public void reloadList() {
-        this.albums = albums;
-        this.notifyDataSetChanged();
     }
 
     public List<Album> getAlbums() {
@@ -126,4 +135,37 @@ public class AlbumAdapter extends ArrayAdapter implements Observer{
             this.notifyDataSetChanged();
         }
     }
+
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    mFilterdata = albums;
+                } else {
+                    List<Album> filteredData = new ArrayList<>();
+                    for (Album album : albums) {
+                        if (album.getName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredData.add(album);
+                        }
+                    }
+                    mFilterdata = filteredData;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterdata;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilterdata = (List<Album>) filterResults.values;
+
+                notifyDataSetChanged();
+            }
+        };
+    }
+
 }

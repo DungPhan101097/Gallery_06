@@ -29,7 +29,6 @@ import java.util.ArrayList;
 
 public class PreviewPhotoOfAlbumActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     public static final String ALBUM_KEY = "album_key";
-    private static final long ANIM_DURATION = 500;
     private RecyclerView rvWrapperPreviewLstPhoto;
     private ArrayList<Photo> lstPhoto;
     private AdapterInnerRecyclerView adapterInnerRecyclerView;

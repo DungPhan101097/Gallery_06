@@ -84,12 +84,12 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
     @Override
     public void update(Observable observable, Object o) {
-       if(observable instanceof DBHelper){
-           DBHelper dbHelper = (DBHelper)observable;
-           this.mFilterdata = dbHelper.getListPhotoByDate();
-           this.notifyDataSetChanged();
+        if(observable instanceof DBHelper){
+            DBHelper dbHelper = (DBHelper)observable;
+            this.mFilterdata = dbHelper.getListPhotoByDate();
+            this.notifyDataSetChanged();
 
-       }
+        }
     }
 
 

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -56,16 +58,17 @@ import com.example.dungit.gallery.presentation.uis.adapters.AlbumAdapter;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AlbumFragment extends Fragment {
+public class AlbumFragment extends Fragment implements SearchView.OnQueryTextListener{
 
     private Context context;
     private ListView listAlbum;
     private AlbumController albumController;
     private List<Album> albums;
     private List<Album> hiddenAlbums;
-
+    private AlbumAdapter albumAdapter;
     private MainActivity main;
     private Album curAlbum;
+    private SearchView searchView;
 
     public AlbumFragment() {
 
@@ -97,7 +100,7 @@ public class AlbumFragment extends Fragment {
 
 
         listAlbum = rootView.findViewById(R.id.listAlbum);
-        AlbumAdapter albumAdapter = new AlbumAdapter(context, albums);
+        albumAdapter = new AlbumAdapter(context, albums);
 
         main.getDBHelper().addObserver(albumAdapter);
 
@@ -164,6 +167,11 @@ public class AlbumFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.option_menu_album, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        final MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Tìm kiếm Album");
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -200,6 +208,17 @@ public class AlbumFragment extends Fragment {
         return super.onContextItemSelected(item);
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        albumAdapter.getFilter().filter(newText);
+        return false;
+    }
+
 
     public static class AlbumExtendSerializable implements Serializable {
         private long id;
@@ -224,5 +243,7 @@ public class AlbumFragment extends Fragment {
         public ArrayList<Photo> getPhotos() {
             return photos;
         }
+
+
     }
 }
