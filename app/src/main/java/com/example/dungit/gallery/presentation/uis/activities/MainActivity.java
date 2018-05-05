@@ -1,6 +1,7 @@
 package com.example.dungit.gallery.presentation.uis.activities;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -18,6 +19,15 @@ import com.example.dungit.gallery.presentation.uis.adapters.MyViewPagerAdapter;
 import com.example.dungit.gallery.presentation.uis.fragments.AlbumFragment;
 import com.example.dungit.gallery.presentation.uis.fragments.PictureFragment;
 import java.util.ArrayList;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
+public class MainActivity extends AppCompatActivity implements MainCallback {
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_EXTERNAL_STORAGE = 1;
@@ -89,6 +99,35 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(myViewPagerAdapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.act_change_view:
+                isCheckedChangeView = !isCheckedChangeView;
+                if (isCheckedChangeView) {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_GRID);
+                } else {
+                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
+                    pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
+
+                }
+                break;
+            case R.id.action_settings:
+                Intent intent = new Intent(MainActivity.this,SettingActivity.class);
+                this.startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main,menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

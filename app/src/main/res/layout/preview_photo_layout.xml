@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-
 >
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/im_preview_photo"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+
         />
 </LinearLayout>

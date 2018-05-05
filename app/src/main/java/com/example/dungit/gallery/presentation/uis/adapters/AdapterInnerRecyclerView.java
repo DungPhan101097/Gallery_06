@@ -96,7 +96,7 @@ public class AdapterInnerRecyclerView
             public void onClick(View view, int position) {
                 Intent intent = new Intent(context, PreviewPhotoActivity.class);
                 int imgPostion = 0;
-                if(context instanceof  MainActivity ){
+                if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
                     if(mFilterdata != photos) {
@@ -107,14 +107,8 @@ public class AdapterInnerRecyclerView
                 }else{
                     PreviewPhotoActivity.setPhotos(mFilterdata);
                     imgPostion=position;
-                }
-                intent.putExtra(PreviewPhotoActivity.IMG_POSITION,imgPostion);
-                try {
-                    context.startActivity(intent);
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-
+                intent.putExtra(PreviewPhotoActivity.IMG_POSITION, imgPostion);
+                context.startActivity(intent);
             }
 
             @Override
