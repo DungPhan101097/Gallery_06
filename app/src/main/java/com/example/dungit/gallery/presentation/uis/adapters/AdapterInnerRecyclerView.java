@@ -162,7 +162,6 @@ public class AdapterInnerRecyclerView
     }
     public boolean toggleItemViewTypeByPreview()
     {
-        isSwitchView_backup = isSwitchView;
         isSwitchView = !isSwitchView;
         return isSwitchView;
     }
