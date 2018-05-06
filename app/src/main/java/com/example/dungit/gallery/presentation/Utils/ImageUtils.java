@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 
@@ -52,12 +53,13 @@ public class ImageUtils {
         String desc =photo.getDescriptImg();
         AlertDialog.Builder builder_1 = new AlertDialog.Builder(context);
         builder_1.setTitle("Thông Tin Ảnh");
-        builder_1.setMessage("Tên ảnh : " + photo.getNameImg() +
-                "\n\nĐường dẫn : " + photo.getPathImg() +
-                "\n\nKích cỡ : " + photo.getSizeImg() +
-                "\n\nKích thước : " + photo.getResoluImg() +
-                "\n\nNgày tạo : " + photo.getDetailDateTaken() +
-                "\n\nChú thích : " + (desc == null? "" : desc));
+        String html = "<b>Tên ảnh</b>: " + photo.getNameImg() +
+                "<br/><br/><b>Đường dẫn</b>: " + photo.getPathImg() +
+                "<br/><br/><b>Kích cỡ</b>: " + photo.getSizeImg() +
+                "<br/><br/><b>Kích thước</b>: " + photo.getResoluImg() +
+                "<br/><br/><b>Ngày tạo</b>: " + photo.getDetailDateTaken() +
+                "<br/><br/><b>Chú thích</b>: " + (desc == null? "" : desc);
+        builder_1.setMessage(Html.fromHtml(html));
         builder_1.setCancelable(false);
         builder_1.setNegativeButton("Đóng", new DialogInterface.OnClickListener() {
             @Override
@@ -70,7 +72,8 @@ public class ImageUtils {
         alertDialog.show();
     }
 
-    private static SimpleDateFormat DATE_FMT_DETAILS = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+    private static SimpleDateFormat DATE_FMT_DETAILS
+            = new SimpleDateFormat("dd/MM/yyyy hh:mm");
     private static SimpleDateFormat DATE_FMT = new SimpleDateFormat("dd/MM/yyyy");
 
     public static String getDate(long time){

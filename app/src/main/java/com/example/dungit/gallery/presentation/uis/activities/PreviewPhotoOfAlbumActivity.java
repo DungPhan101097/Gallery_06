@@ -11,28 +11,29 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.dungit.gallery.R;
-import com.example.dungit.gallery.presentation.entities.EMODE;
+import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
-import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
-import com.example.dungit.gallery.presentation.uis.fragments.AlbumFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by DUNGIT on 4/26/2018.
  */
 
-public class PreviewPhotoOfAlbumActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class PreviewPhotoOfAlbumActivity extends AppCompatActivity
+        implements SearchView.OnQueryTextListener {
     public static final String ALBUM_KEY = "album_key";
     private RecyclerView rvWrapperPreviewLstPhoto;
-    private ArrayList<Photo> lstPhoto;
+    private List<Photo> lstPhoto;
     private AdapterInnerRecyclerView adapterInnerRecyclerView;
     SearchView searchView;
+
+    static private Album album;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,23 +44,27 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity implements Se
         Toolbar toolbarTop = findViewById(R.id.tb_top_album);
         setSupportActionBar(toolbarTop);
 
-        if(intent != null){
-            AlbumFragment.AlbumExtendSerializable album =
-                    (AlbumFragment.AlbumExtendSerializable) intent.getSerializableExtra(ALBUM_KEY);
-            lstPhoto = album.getPhotos();
-            getSupportActionBar().setTitle(album.getName());
-        }
-        adapterInnerRecyclerView = new  AdapterInnerRecyclerView(this, lstPhoto);
-        rvWrapperPreviewLstPhoto = findViewById(R.id.rv_wrapper_preview_lst_photo);
-        rvWrapperPreviewLstPhoto.setHasFixedSize(true);
-        if(adapterInnerRecyclerView.getViewType())
-            rvWrapperPreviewLstPhoto.setLayoutManager(new GridLayoutManager(this, 4));
-        else
-            rvWrapperPreviewLstPhoto.setLayoutManager(new LinearLayoutManager(this));
-        rvWrapperPreviewLstPhoto.setAdapter(adapterInnerRecyclerView);
+//        if(intent != null){
+//            AlbumFragment.AlbumExtendSerializable album =
+//                    (AlbumFragment.AlbumExtendSerializable) intent.getSerializableExtra(ALBUM_KEY);
+//            lstPhoto = album.getPhotos();
+//            getSupportActionBar().setTitle(album.getName());
+//        }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if(album != null) {
+            getSupportActionBar().setTitle(album.getName());
+            lstPhoto = album.getPhotos();
+            adapterInnerRecyclerView = new AdapterInnerRecyclerView(this, lstPhoto);
+            rvWrapperPreviewLstPhoto = findViewById(R.id.rv_wrapper_preview_lst_photo);
+            rvWrapperPreviewLstPhoto.setHasFixedSize(true);
+            if (adapterInnerRecyclerView.getViewType())
+                rvWrapperPreviewLstPhoto.setLayoutManager(new GridLayoutManager(this, 4));
+            else
+                rvWrapperPreviewLstPhoto.setLayoutManager(new LinearLayoutManager(this));
+            rvWrapperPreviewLstPhoto.setAdapter(adapterInnerRecyclerView);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
 
@@ -96,7 +101,9 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity implements Se
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        String text = newText;
+        if(newText.isEmpty() && adapterInnerRecyclerView.getFilter() != lstPhoto )
+            adapterInnerRecyclerView.setData(lstPhoto);
+        else
             adapterInnerRecyclerView.getFilter().filter(newText);
         return false;
     }
@@ -106,5 +113,9 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity implements Se
         onBackPressed();
         adapterInnerRecyclerView.setbackViewType();
         return true;
+    }
+
+    public static void setAlbum(Album album) {
+        PreviewPhotoOfAlbumActivity.album = album;
     }
 }

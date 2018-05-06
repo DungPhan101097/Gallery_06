@@ -2,7 +2,6 @@ package com.example.dungit.gallery.presentation.uis.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +22,6 @@ import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.viewholder.AlbumViewHolder;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,6 +45,11 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
         this.albums = albums;
         this.mFilterdata = albums;
 
+    }
+
+    public void setListAlbum(List<Album> albums){
+        this.mFilterdata = albums;
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -162,7 +165,6 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 mFilterdata = (List<Album>) filterResults.values;
-
                 notifyDataSetChanged();
             }
         };

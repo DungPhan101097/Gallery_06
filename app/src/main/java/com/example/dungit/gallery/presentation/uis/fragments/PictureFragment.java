@@ -171,6 +171,12 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
 
     }
 
+    public void viewAllPhotos(){
+        if(adapterRecyclerView != null && adapterRecyclerView.getData() != lstPhotoSameDate){
+            adapterRecyclerView.setData(lstPhotoSameDate);
+        }
+    }
+
     //Hàm cho filter
 
     @Override

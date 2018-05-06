@@ -22,6 +22,7 @@ import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -33,22 +34,23 @@ public class AdapterInnerRecyclerView
         extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer, Filterable {
 
 
-    private ArrayList<Photo> data;
+    private List<Photo> data;
     private Context context;
-    private ArrayList<Photo> mFilterdata;
+    private List<Photo> mFilterdata;
     private static final int LIST_ITEM = 1;
     private static final int GRID_ITEM = 0;
     private static boolean isSwitchView = true;
     private static boolean isSwitchView_backup = true;
 
-    public AdapterInnerRecyclerView(Context context, ArrayList<Photo> data) {
+    public AdapterInnerRecyclerView(Context context, List<Photo> data) {
         this.data = data;
         this.mFilterdata = data;
         this.context = context;
     }
 
-    public void setData(ArrayList<Photo> data) {
+    public void setData(List<Photo> data) {
         this.mFilterdata = data;
+        this.notifyDataSetChanged();
     }
 
     @NonNull
@@ -119,6 +121,8 @@ public class AdapterInnerRecyclerView
             this.notifyDataSetChanged();
         }
     }
+
+
 
 
     // Ham danh cho Filter va ViewType

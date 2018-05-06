@@ -29,6 +29,7 @@ import android.widget.Toast;
 import android.widget.Scroller;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 import com.example.dungit.gallery.R;
@@ -60,7 +61,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private Scroller slideShowScoller;
     private PhotoDatabaseHelper dbHelper;
 
-    private static ArrayList<Photo> photos = null;
+    private static List<Photo> photos = null;
     private static int slideShowDelay = 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
 
@@ -149,7 +150,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 inputDialog.showDialog();
             }
             break;
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -158,6 +158,15 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         stopSlideShow();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if(isSlideRunning)
+            stopSlideShow();
+        else
+            super.onBackPressed();
     }
 
     @Override
@@ -202,6 +211,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
             }
         });
+        mPager.setOffscreenPageLimit(2);
     }
 
     public void initBottomMenu(){
@@ -268,7 +278,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
 
     //STATICS
-    public static void setPhotos(ArrayList<Photo> photos) {
+    public static void setPhotos(List<Photo> photos) {
         PreviewPhotoActivity.photos = photos;
     }
 

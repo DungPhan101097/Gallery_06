@@ -19,6 +19,7 @@ import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -47,6 +48,12 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
     public void setData(ArrayList<ListPhotoSameDate> data) {
         this.data = data;
+        this.mFilterdata = data;
+        this.notifyDataSetChanged();
+    }
+
+    public List<ListPhotoSameDate> getData(){
+        return mFilterdata;
     }
 
     @NonNull

@@ -14,15 +14,16 @@ import com.example.dungit.gallery.presentation.entities.Photo;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PhotoSlideAdapter  extends PagerAdapter{
 
-    private ArrayList<Photo> images;
+    private List<Photo> images;
     private LayoutInflater inflater;
     private Context context;
 
 
-    public PhotoSlideAdapter(Context context, ArrayList<Photo> images) {
+    public PhotoSlideAdapter(Context context, List<Photo> images) {
         this.context = context;
         this.images=images;
         inflater = LayoutInflater.from(context);

@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
@@ -84,7 +86,38 @@ public class MainActivity extends AppCompatActivity{
         lstFragment.add(albumFragment);
 
         viewPager = findViewById(R.id.viewpager);
+
         TabLayout tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                //hide keyboard
+                View view = MainActivity.this.getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm =
+                            (InputMethodManager)getSystemService(MainActivity.this.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int pos = tab.getPosition();
+                Fragment fragment = lstFragment.get(pos);
+                if(fragment instanceof  PictureFragment){
+                    PictureFragment pictureFragment_ = (PictureFragment)fragment;
+                    pictureFragment_.viewAllPhotos();
+                }else if(fragment instanceof  AlbumFragment){
+                    AlbumFragment albumFragment_ = (AlbumFragment)fragment;
+                    albumFragment_.viewAllAlbum();
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         MyViewPagerAdapter myViewPagerAdapter = new MyViewPagerAdapter(getSupportFragmentManager());
         myViewPagerAdapter.setLstFragMent(lstFragment);
@@ -94,35 +127,6 @@ public class MainActivity extends AppCompatActivity{
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setTabsFromPagerAdapter(myViewPagerAdapter);
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        switch (id) {
-//            case R.id.act_change_view:
-//                isCheckedChangeView = !isCheckedChangeView;
-//                if (isCheckedChangeView) {
-//                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_grid_mode));
-//                    pictureFragment.onChangeView(EMODE.MODE_GRID);
-//                } else {
-//                    item.setIcon(getResources().getDrawable(R.drawable.btn_gallery_detail_mode));
-//                    pictureFragment.onChangeView(EMODE.MODE_BY_DATE);
-//
-//                }
-//                break;
-//            case R.id.action_settings:
-//                Intent intent = new Intent(MainActivity.this,SettingActivity.class);
-//                this.startActivity(intent);
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main,menu);
-//        return super.onCreateOptionsMenu(menu);
-//    }
 
     @Override
     public void onBackPressed() {

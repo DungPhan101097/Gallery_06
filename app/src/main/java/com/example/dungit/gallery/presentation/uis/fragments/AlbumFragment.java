@@ -17,45 +17,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoOfAlbumActivity;
-import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
-import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AlbumAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.view.ContextMenu;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.Utils.SortType;
 import com.example.dungit.gallery.presentation.controller.AlbumController;
 import com.example.dungit.gallery.presentation.entities.Album;
-import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
-import com.example.dungit.gallery.presentation.uis.adapters.AlbumAdapter;
-
-import java.util.LinkedList;
 import java.util.List;
 
 public class AlbumFragment extends Fragment implements SearchView.OnQueryTextListener{
@@ -127,10 +103,10 @@ public class AlbumFragment extends Fragment implements SearchView.OnQueryTextLis
                 // Khi click vao 1 album thi thay doi fragment, khi click vao nut Back cung thay doi fragment.
                 curAlbum = albums.get(i);
                 Intent intent = new Intent(context, PreviewPhotoOfAlbumActivity.class);
-                AlbumExtendSerializable albumExtendSerializable = new AlbumExtendSerializable(curAlbum);
-
-                intent.putExtra(PreviewPhotoOfAlbumActivity.ALBUM_KEY, albumExtendSerializable);
-
+//                AlbumExtendSerializable albumExtendSerializable = new AlbumExtendSerializable(curAlbum);
+//
+//                intent.putExtra(PreviewPhotoOfAlbumActivity.ALBUM_KEY, albumExtendSerializable);
+                PreviewPhotoOfAlbumActivity.setAlbum(curAlbum);
                 context.startActivity(intent);
             }
         });
@@ -139,6 +115,12 @@ public class AlbumFragment extends Fragment implements SearchView.OnQueryTextLis
         registerForContextMenu(listAlbum);
 
         return rootView;
+    }
+
+    public void viewAllAlbum(){
+        if( albumAdapter != null && albumAdapter.getAlbums() != albums){
+            albumAdapter.setListAlbum(albums);
+        }
     }
 
     @Override
