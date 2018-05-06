@@ -27,8 +27,6 @@ public class Photo implements Serializable {
     private int height;
     private String descriptImg;
 
-    private boolean isLove;
-
 
     public Photo(long idImg, long dateTakenNumber, long albumId, String albumName, File file) {
         this.idImg = idImg;
@@ -37,7 +35,6 @@ public class Photo implements Serializable {
         this.pathUrl = Uri.withAppendedPath(EXTERNAL_URI, Long.toString(idImg)).toString();
         this.dateTakenNumber = dateTakenNumber;
         this.file = file;
-        this.isLove = false;
     }
 
     public Photo(long idImg, long dataTakenNumber, long albumId, String albumName
@@ -46,17 +43,12 @@ public class Photo implements Serializable {
         this.width = width;
         this.height = height;
         this.descriptImg = descriptImg;
-        this.isLove = false;
     }
 
 
     public long getIdImg() {
         return idImg;
     }
-
-    public boolean getLoveImg(){return this.isLove; }
-
-    public void setLove(boolean b_love){ this.isLove = b_love;}
 
     public void setIdImg(long idImg) {
         this.idImg = idImg;

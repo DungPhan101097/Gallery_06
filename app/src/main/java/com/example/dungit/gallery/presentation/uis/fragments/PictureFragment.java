@@ -3,13 +3,7 @@ package com.example.dungit.gallery.presentation.uis.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -22,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.entities.EMODE;
@@ -33,15 +26,7 @@ import com.example.dungit.gallery.presentation.uis.activities.SettingActivity;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by DUNGIT on 4/22/2018.
@@ -60,8 +45,6 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
     private GridLayoutManager gridLayoutManager;
     private boolean gridMode=false;
     private SearchView searchView;
-
-    private static final int CAMERA_REQUEST = 1;
 
 
     public static PictureFragment newInstance(ArrayList<ListPhotoSameDate> lstPhoto) {
@@ -105,16 +88,6 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
 
         rvWrapper.setLayoutManager(linearLayoutManager);
         rvWrapper.setAdapter(adapterRecyclerView);
-
-        FloatingActionButton fbCam = view.findViewById(R.id.faCamera);
-        fbCam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startShoot();
-                //startSave();
-                //refreshGallery(rf);
-            }
-        });
 
         return view;
     }
@@ -220,41 +193,6 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
             adapterRecyclerView.getFilter().filter(newText);
         }
         return false;
-    }
-
-    public void startShoot(){
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM+"/Camera/");
-        String pic = getPic();
-        File img = new File(dir, pic);
-        Uri picUri = Uri.fromFile(img);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
-        startActivityForResult(intent, CAMERA_REQUEST);
-        refreshGallery(img);
-
-        //startActivityForResult(intent, CAMERA_REQUEST );
-    }
-
-    private String getPic(){
-        SimpleDateFormat sd = new SimpleDateFormat("hhssddmmyy");
-        String stamp = sd.format(new Date());
-        return "IMG-"+stamp+".jpg";
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK){
-            if (requestCode == CAMERA_REQUEST){
-
-            }
-        }
-
-    }
-    public void refreshGallery(File file){
-        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        intent.setData(Uri.fromFile(file));
-        main.sendBroadcast(intent);
     }
 
 }

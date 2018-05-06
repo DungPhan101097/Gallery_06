@@ -46,8 +46,6 @@ public class DBHelper extends Observable {
             };
     private static final String USER_ALBUM_FLODER
             = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Albums06/";
-    private static final String USER_ALBUM_LOVE_FLODER
-            = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Albums06/Love/";
 
     private ArrayList<ListPhotoSameDate> listPhotoByDate = new ArrayList<>();
     private ArrayList<Photo> listPhoto = new ArrayList<>();
@@ -199,7 +197,6 @@ public class DBHelper extends Observable {
 
     void scanUserAlbums(HashMap<Long, String> albumNames, HashSet<Long> hideids) {
         File albumFile = new File(USER_ALBUM_FLODER);
-        File loveFile = new File(USER_ALBUM_LOVE_FLODER);
         File[] files = albumFile.listFiles(new EmptyFolderFileFilter());
         if (files == null) return;
         for (File file : files) {
@@ -256,26 +253,6 @@ public class DBHelper extends Observable {
             addListPhotoForReshowAlbum(unhideAlbum);
             databaseHelper.removeHideAlbum(unhideAlbum.getId());
         }
-        setChanged();
-        notifyObservers();
-    }
-
-
-    public void refresh(Uri uri){
-        Intent scanFileIntent = new Intent(
-                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri);
-        context.sendBroadcast(scanFileIntent);
-
-        setChanged();
-        notifyObservers();
-    }
-
-    public void reshowImg()
-    {
-//        String idStr = String.valueOf(photo.getIdImg());
-//        context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-//                MediaStore.Images.ImageColumns.BUCKET_ID + " = ?",
-//                new String[]{idStr});
         setChanged();
         notifyObservers();
     }

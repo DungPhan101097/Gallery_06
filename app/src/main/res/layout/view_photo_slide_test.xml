@@ -8,7 +8,6 @@
     <include layout="@layout/view_photo_slide" />
 
 
-
     <android.support.v7.widget.Toolbar
         android:id="@+id/photo_toolbar_top"
         android:layout_width="match_parent"

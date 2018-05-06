@@ -33,14 +33,10 @@ import java.util.List;
 public class AlbumController {
     private static final File USER_ALBUM_FLODER
             = new File(Environment.getExternalStorageDirectory(), "Albums06/");
-    private static final File USER_ALBUM_LOVE_FLODER
-            = new File(USER_ALBUM_FLODER.toString(), "/Love/");
     private static final ImageFileFilter imageFileFilter = new ImageFileFilter();
     static {
         if (!USER_ALBUM_FLODER.exists())
             USER_ALBUM_FLODER.mkdirs();
-        if (!USER_ALBUM_LOVE_FLODER.exists())
-            USER_ALBUM_LOVE_FLODER.mkdirs();
     }
 
     private Context context;
