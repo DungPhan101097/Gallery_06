@@ -9,10 +9,13 @@ import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -25,20 +28,33 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.support.v7.widget.Toolbar;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.Scroller;
+import android.widget.ToggleButton;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelper;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.PhotoSlideAdapter;
 import com.example.dungit.gallery.presentation.uis.animation.FixedSpeedScroller;
 import com.example.dungit.gallery.presentation.uis.dialog.InputDialog;
 import com.example.dungit.gallery.presentation.Utils.*;
+import com.example.dungit.gallery.presentation.uis.fragments.PictureFragment;
 
 
 /**
@@ -65,6 +81,13 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static int slideShowDelay = 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
 
+    AlertDialog dialog;
+
+    String temp = "";
+
+    private ToggleButton toggleButton;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +96,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setWindowAnimations(Animation.ZORDER_TOP);
+
 
         Intent intent = getIntent();
         if (photos != null && intent != null) {
@@ -86,6 +110,9 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+
             initPageViewer();
             initBottomMenu();
 
@@ -188,6 +215,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 }
             }
         };
+
+
         mPager.setAdapter(adapter);
         mPager.setCurrentItem(currentPage);
         mPager.setPageTransformer(false, slideAnimation);
@@ -197,6 +226,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 final Photo photo = photos.get(position);
                 String name = photo.getFile().getName();
                 getSupportActionBar().setTitle(name);
+                SetLove();
             }
 
             @Override
@@ -211,26 +241,108 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
             }
         });
+
+
         mPager.setOffscreenPageLimit(2);
     }
 
     public void initBottomMenu(){
         bNV = findViewById(R.id.bottom_navigation);
         MenuUtils.removeShiftMode(bNV);
+
+
+        toggleButton = (ToggleButton) findViewById(R.id.myToggleButton);
+        toggleButton.setChecked(false);
+        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.img_heart_grey));
+        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.img_heart_red));
+                    photos.get(currentPage).setLove(true);
+                    File src = photos.get(currentPage).getFile();
+                    SimpleDateFormat sd = new SimpleDateFormat("hhssddmmyy");
+                    String stamp = sd.format(new Date());
+                    File des = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Albums06/Love/",
+                            "IMG-" + stamp + ".jpg");
+                    temp = des.toString();
+                    try {
+                        copy(src,des);
+                        Toast.makeText(PreviewPhotoActivity.this, "Đã thêm vào mục yêu thích", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(PreviewPhotoActivity.this, "Fail", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.img_heart_grey));
+                    photos.get(currentPage).setLove(false);
+                    if (temp != ""){
+                        File delLove = new File(temp);
+                        boolean bDelFile = delLove.delete();
+                        if (bDelFile){
+                            refreshGallery(delLove);
+                            //dbHelper.reshowImg();
+                            Toast.makeText(PreviewPhotoActivity.this, "Đã xóa khỏi mục ưa thích", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        temp = "";
+                    }
+                }
+            }
+        });
+
+
         bNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.photo_action_slideshow) {
-                    if (handler != null) {
-                        if (!isSlideRunning) {
-                            startSlideShow();
-                        } else {
-                            stopSlideShow();
-                        }
+
+                switch (item.getItemId()){
+                    case R.id.photo_action_delete:{
+                        dialog = new AlertDialog.Builder(PreviewPhotoActivity.this).create();
+                        dialog.setTitle("Delete image?");
+                        dialog.setMessage("You sure?");
+                        dialog.setButton("Yes", new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                startDelete();
+
+                            }
+                        });
+                        dialog.setButton2("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                        dialog.show();
+//                        dbHelper.loadData();
+//                        dbHelper.reshowImg();
+                        //main.getDBHelper().reshowImg();
+                        mPager.setCurrentItem(currentPage + 1);
+                        return true;
                     }
+                    case R.id.photo_action_send:{
+                        startShare();
+                        return true;
+                    }
+
+                    case R.id.photo_action_edit:{
+
+                    }
+                    case R.id.photo_action_slideshow:{
+                        if(handler != null) {
+                            if (!isSlideRunning) {
+                                startSlideShow();
+                            } else {
+                                stopSlideShow();
+                            }
+                        }
+                        return true;
+                    }
+                    default:
+                        return false;
                 }
-                return false;
             }
         });
     }
@@ -300,4 +412,56 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         PreviewPhotoActivity.slideAnimation = slideAnimation;
     }
 
+    public void startShare(){
+        Photo cur = photos.get(currentPage);
+        File fileShare = cur.getFile();
+        fileShare.setReadable(true, false);
+        final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fileShare));
+        intent.setType("image/jpg");
+        startActivity(Intent.createChooser(intent, "Share image via"));
+    }
+
+    public void startDelete(){
+        Photo cur = photos.get(currentPage);
+        File fileDelete = cur.getFile();
+        boolean bDelFile = fileDelete.delete();
+        if (bDelFile){
+            Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
+            refreshGallery(fileDelete);
+            String idStr = String.valueOf(cur.getIdImg());
+            PreviewPhotoActivity.this.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Images.ImageColumns.BUCKET_ID + " = ?",
+                    new String[]{idStr});
+           // dbHelper.reshowImg();
+
+            return;
+        }
+        Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show();
+    }
+    public void refreshGallery(File file){
+        Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        intent.setData(Uri.fromFile(file));
+        sendBroadcast(intent);
+    }
+
+    public void copy(File src, File dst) throws IOException {
+        FileInputStream inStream = new FileInputStream(src);
+        FileOutputStream outStream = new FileOutputStream(dst);
+        FileChannel inChannel = inStream.getChannel();
+        FileChannel outChannel = outStream.getChannel();
+        inChannel.transferTo(0, inChannel.size(), outChannel);
+        inStream.close();
+        outStream.close();
+    }
+
+    public void SetLove(){
+        if (photos.get(currentPage).getLoveImg()){
+            toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.img_heart_red));
+        }
+        else {
+            toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.img_heart_grey));
+        }
+    }
 }
