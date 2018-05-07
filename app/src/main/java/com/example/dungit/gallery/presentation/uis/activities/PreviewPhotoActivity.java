@@ -37,6 +37,7 @@ import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelpe
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.PhotoSlideAdapter;
 import com.example.dungit.gallery.presentation.uis.animation.FixedSpeedScroller;
+import com.example.dungit.gallery.presentation.uis.dialog.ConfirmDialog;
 import com.example.dungit.gallery.presentation.uis.dialog.InputDialog;
 import com.example.dungit.gallery.presentation.Utils.*;
 
@@ -163,8 +164,10 @@ public class PreviewPhotoActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(isSlideRunning)
+        if(isSlideRunning) {
             stopSlideShow();
+            mPager.setCurrentItem(currentPage);
+        }
         else
             super.onBackPressed();
     }
@@ -220,6 +223,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         bNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                final Photo photo=photos.get(currentPage);
                 int id = item.getItemId();
                 if (id == R.id.photo_action_slideshow) {
                     if (handler != null) {
@@ -229,6 +233,25 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                             stopSlideShow();
                         }
                     }
+                }else if(id == R.id.photo_action_delete){
+                    ConfirmDialog dialog = new ConfirmDialog(PreviewPhotoActivity.this,
+                            "Bạn Có Chắc Muốn Xóa Ảnh?","Xóa","Hủy") {
+                        @Override
+                        public void onPositiveButtonClick() {
+                            if(photos.remove(photo)){
+                                if(photos.size()  == 0)
+                                    onBackPressed();
+                                else
+                                    mPager.getAdapter().notifyDataSetChanged();
+                                MainActivity.getDBHelper().deletePhoto(photo);
+                                ImageUtils.deletePhoto(PreviewPhotoActivity.this,photo);
+                            }
+
+                        }
+                    };
+                    dialog.showDialog();
+                }else if(id == R.id.photo_action_send){
+                    ImageUtils.sendPhoto(PreviewPhotoActivity.this,photo);
                 }
                 return false;
             }

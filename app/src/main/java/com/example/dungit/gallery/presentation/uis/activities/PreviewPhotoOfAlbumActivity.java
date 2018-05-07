@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -27,7 +28,6 @@ import java.util.List;
 
 public class PreviewPhotoOfAlbumActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
-    public static final String ALBUM_KEY = "album_key";
     private RecyclerView rvWrapperPreviewLstPhoto;
     private List<Photo> lstPhoto;
     private AdapterInnerRecyclerView adapterInnerRecyclerView;
@@ -43,13 +43,6 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity
         Intent intent = getIntent();
         Toolbar toolbarTop = findViewById(R.id.tb_top_album);
         setSupportActionBar(toolbarTop);
-
-//        if(intent != null){
-//            AlbumFragment.AlbumExtendSerializable album =
-//                    (AlbumFragment.AlbumExtendSerializable) intent.getSerializableExtra(ALBUM_KEY);
-//            lstPhoto = album.getPhotos();
-//            getSupportActionBar().setTitle(album.getName());
-//        }
 
         if(album != null) {
             getSupportActionBar().setTitle(album.getName());
@@ -117,5 +110,12 @@ public class PreviewPhotoOfAlbumActivity extends AppCompatActivity
 
     public static void setAlbum(Album album) {
         PreviewPhotoOfAlbumActivity.album = album;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(rvWrapperPreviewLstPhoto != null)
+            rvWrapperPreviewLstPhoto.getAdapter().notifyDataSetChanged();
     }
 }

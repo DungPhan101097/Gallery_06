@@ -31,7 +31,8 @@ import java.util.Observer;
  */
 
 public class AdapterInnerRecyclerView
-        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder> implements Observer, Filterable {
+        extends RecyclerView.Adapter<AdapterInnerRecyclerView.InnerViewHolder>
+        implements Observer, Filterable {
 
 
     private List<Photo> data;
@@ -88,13 +89,13 @@ public class AdapterInnerRecyclerView
                 if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
                     ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
-                    if (mFilterdata != photos) {
+                    if (data != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
-                        imgPostion = photos.indexOf(mFilterdata.get(position));
+                        imgPostion = photos.indexOf(data.get(position));
                         imgPostion = imgPostion >= 0 ? imgPostion : 0;
                     }
                 } else {
-                    PreviewPhotoActivity.setPhotos(mFilterdata);
+                    PreviewPhotoActivity.setPhotos(data);
                     imgPostion = position;
                 }
                 intent.putExtra(PreviewPhotoActivity.IMG_POSITION, imgPostion);

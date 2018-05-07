@@ -3,6 +3,8 @@ package com.example.dungit.gallery.presentation.uis.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity{
     private static final int MY_PERMISSION_EXTERNAL_STORAGE = 1;
     private ArrayList<Fragment> lstFragment = new ArrayList<>();
-    private DBHelper dbHelper;
+    private static DBHelper dbHelper;
     private ViewPager viewPager;
 
     @Override
@@ -136,7 +138,17 @@ public class MainActivity extends AppCompatActivity{
             viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
         }
     }
-    public DBHelper getDBHelper() {
+    public static DBHelper getDBHelper() {
         return dbHelper;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Intent scanFileIntent = new Intent(
+                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                Uri.parse("file://" + Environment.getExternalStorageDirectory()));
+        this.sendBroadcast(scanFileIntent);
+
     }
 }

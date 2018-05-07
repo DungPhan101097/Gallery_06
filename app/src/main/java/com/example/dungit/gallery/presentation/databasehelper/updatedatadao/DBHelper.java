@@ -297,4 +297,16 @@ public class DBHelper extends Observable {
     public List<Album> getListHiddenAlbums() {
         return listHiddenAlbum;
     }
+
+
+
+    public void deletePhoto(Photo photo){
+        listPhoto.remove(photo);
+        for (Album album: listAlbum) {
+            album.getPhotos().remove(photo);
+        }
+        convertListPhoto2ListPhotoSameDate(listPhoto);
+        setChanged();
+        notifyObservers();
+    }
 }

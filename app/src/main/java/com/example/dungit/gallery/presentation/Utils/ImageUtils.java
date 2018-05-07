@@ -4,15 +4,20 @@ import android.app.AlertDialog;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.Html;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
+import com.example.dungit.gallery.presentation.uis.dialog.ConfirmDialog;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -84,5 +89,23 @@ public class ImageUtils {
     public static String getDetailDate(long time){
         Date date = new Date(time);
         return DATE_FMT_DETAILS.format(date);
+    }
+
+    public static void deletePhoto(Context context, Photo photo){
+        context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                MediaStore.Images.ImageColumns._ID + " = ?",
+                new String[]{String.valueOf(photo.getIdImg())});
+
+    }
+
+    public static void sendPhoto(Context context,Photo photo){
+        File fileShare = photo.getFile();
+        fileShare.setReadable(true, false);
+        final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(fileShare));
+        intent.setType("image/jpg");
+        context.startActivity(Intent.createChooser(intent, "Share image via"));
+
     }
 }

@@ -30,6 +30,11 @@ public class PhotoSlideAdapter  extends PagerAdapter{
     }
 
     @Override
+    public int getItemPosition(Object object){
+        return PagerAdapter.POSITION_NONE;
+    }
+
+    @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
     }
