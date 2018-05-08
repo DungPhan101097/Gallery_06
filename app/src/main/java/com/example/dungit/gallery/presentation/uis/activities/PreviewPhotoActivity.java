@@ -65,6 +65,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static List<Photo> photos = null;
     private static int slideShowDelay = 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
+    
+    private String img_Url;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
         getWindow().setWindowAnimations(Animation.ZORDER_TOP);
 
         Intent intent = getIntent();
+        img_Url = intent.getStringExtra("filePath");
         if (photos != null && intent != null) {
             currentPage = intent.getIntExtra(IMG_POSITION, 0);
 
