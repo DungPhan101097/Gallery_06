@@ -230,6 +230,12 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                         }
                     }
                 }
+                else if(id == R.id.photo_action_edit)
+                {
+                    Intent myIntent = new Intent(PreviewPhotoActivity.this, EditPhoto.class);
+                    myIntent.putExtra("filePath",img_Url); //Optional parameters
+                    PreviewPhotoActivity.this.startActivity(myIntent);
+                }
                 return false;
             }
         });
