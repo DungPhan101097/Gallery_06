@@ -99,6 +99,7 @@ public class AdapterInnerRecyclerView
                     imgPostion = position;
                 }
                 intent.putExtra(PreviewPhotoActivity.IMG_POSITION, imgPostion);
+                intent.putExtra("filePath",data.get(position).getFile().toString());
                 context.startActivity(intent);
             }
 
