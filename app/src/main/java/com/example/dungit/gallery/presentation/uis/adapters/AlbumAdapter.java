@@ -49,6 +49,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
 
     public void setListAlbum(List<Album> albums){
         this.mFilterdata = albums;
+        this.albums = albums;
         this.notifyDataSetChanged();
     }
 
@@ -85,7 +86,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
 
         Photo lastedPhoto =  album.getLastestPhotos();
         if (lastedPhoto == null) {
-            GlideApp.with(this.context).load(R.drawable.place_holder)
+            GlideApp.with(this.context).load(R.drawable.empty_album)
                     .fitCenter().into(myViewHolder.imgAlbum);
         } else {
             GlideApp.with(this.context).load(lastedPhoto.getUrl())

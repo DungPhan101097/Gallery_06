@@ -89,5 +89,12 @@
 
     </RadioGroup>
 
+    <Button
+        android:id="@+id/btnSaveSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lưu Cài Đặt"
+        android:layout_gravity="center_horizontal"
+        />
 
 </LinearLayout>

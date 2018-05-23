@@ -7,8 +7,18 @@
     tools:context="com.example.dungit.gallery.presentation.uis.fragments.AlbumFragment"
 >
 
-    <include layout="@layout/album_main" />
-
+    <ListView
+        android:id="@+id/listAlbum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:dividerHeight="0dp"
+        android:divider="@null"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
+        android:scrollbarSize="@dimen/scrollbar_size"
+        android:scrollbarStyle="outsideOverlay"
+        />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabAlbum"
         android:layout_width="wrap_content"
