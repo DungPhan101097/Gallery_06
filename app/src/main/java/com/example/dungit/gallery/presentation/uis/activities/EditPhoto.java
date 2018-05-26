@@ -42,13 +42,13 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
         String myPicture = intent.getStringExtra("filePath");
         settingsList
                 .getSettingsModel(EditorLoadSettings.class)
-                .setImageSourcePath(myPicture,false) // Load with delete protection true!
+                .setImageSourcePath(myPicture,true) // Load with delete protection true!
 
                 .getSettingsModel(EditorSaveSettings.class)
                 .setExportDir(Directory.DCIM, FOLDER)
                 .setExportPrefix("result_")
                 .setSavePolicy(
-                        EditorSaveSettings.SavePolicy.RETURN_ALWAYS_ONLY_OUTPUT
+                        EditorSaveSettings.SavePolicy.KEEP_SOURCE_AND_CREATE_ALWAYS_OUTPUT
                 );
         new PhotoEditorBuilder(this)
                 .setSettingsList(settingsList)
@@ -62,6 +62,8 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
 
             String resultPath = data.getStringExtra(ImgLyIntent.RESULT_IMAGE_PATH);
             String sourcePath = data.getStringExtra(ImgLyIntent.SOURCE_IMAGE_PATH);
+
+            onBackPressed();
 
             if (resultPath != null) {
                 // Scan result file
@@ -83,11 +85,13 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
 
             Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
 
-            DBHelper dbHelper = new DBHelper(this);
-            dbHelper.LoadAfterEdit();
+            //MainActivity.getDBHelper().reloadData();
 
         }
+
+        onBackPressed();
     }
+
 
     // Important permission request for Android 6.0 and above, don't forget this!
     @Override
