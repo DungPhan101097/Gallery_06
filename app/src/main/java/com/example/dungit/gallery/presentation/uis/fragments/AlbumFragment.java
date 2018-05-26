@@ -100,12 +100,8 @@ public class AlbumFragment extends Fragment implements SearchView.OnQueryTextLis
         listAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // Khi click vao 1 album thi thay doi fragment, khi click vao nut Back cung thay doi fragment.
-                curAlbum = albums.get(i);
+                curAlbum = albumAdapter.getAlbums().get(i);
                 Intent intent = new Intent(context, PreviewPhotoOfAlbumActivity.class);
-//                AlbumExtendSerializable albumExtendSerializable = new AlbumExtendSerializable(curAlbum);
-//
-//                intent.putExtra(PreviewPhotoOfAlbumActivity.ALBUM_KEY, albumExtendSerializable);
                 PreviewPhotoOfAlbumActivity.setAlbum(curAlbum);
                 context.startActivity(intent);
             }

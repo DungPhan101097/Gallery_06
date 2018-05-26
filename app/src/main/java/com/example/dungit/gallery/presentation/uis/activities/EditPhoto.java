@@ -85,8 +85,6 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
 
             Toast.makeText(this, "Image Save on: " + resultPath, Toast.LENGTH_LONG).show();
 
-            //MainActivity.getDBHelper().reloadData();
-
         }
 
         onBackPressed();

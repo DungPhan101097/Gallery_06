@@ -65,6 +65,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static List<Photo> photos = null;
     private static int slideShowDelay = 5000;
     private static ViewPager.PageTransformer slideAnimation = null;
+    
+    private String img_Url;
 
     private String img_Url;
 

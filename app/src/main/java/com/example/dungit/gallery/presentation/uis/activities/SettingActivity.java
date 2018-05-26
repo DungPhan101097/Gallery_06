@@ -3,6 +3,8 @@ package com.example.dungit.gallery.presentation.uis.activities;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.support.v7.widget.Toolbar;
@@ -14,16 +16,18 @@ import com.example.dungit.gallery.presentation.uis.animation.ZoomOutPageTransfor
 
 public class SettingActivity extends AppCompatActivity {
 
-    RadioGroup rgAnimation;
-    RadioButton rbDefault;
-    RadioButton rbZoom;
-    RadioButton rbDepth;
-    RadioButton rbFade;
+    private Button btnSaveSetting;
 
-    RadioGroup rgSlideTime;
-    RadioButton rb3s;
-    RadioButton rb5s;
-    RadioButton rb10s;
+    private RadioGroup rgAnimation;
+    private RadioButton rbDefault;
+    private RadioButton rbZoom;
+    private RadioButton rbDepth;
+    private RadioButton rbFade;
+
+    private RadioGroup rgSlideTime;
+    private RadioButton rb3s;
+    private RadioButton rb5s;
+    private RadioButton rb10s;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,7 @@ public class SettingActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.tb_top_setting);
         setSupportActionBar(toolbar);
 
+        btnSaveSetting = findViewById(R.id.btnSaveSetting);
 
         rgAnimation = findViewById(R.id.rgAnimation);
         rbDefault = findViewById(R.id.rbDefault);
@@ -44,6 +49,14 @@ public class SettingActivity extends AppCompatActivity {
         rb3s = findViewById(R.id.rb3s);
         rb5s = findViewById(R.id.rb5s);
         rb10s = findViewById(R.id.rb10s);
+
+
+        btnSaveSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingActivity.this.onBackPressed();
+            }
+        });
 
 
         int slideShowDelay = PreviewPhotoActivity.getSlideShowDelay();

@@ -49,6 +49,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
 
     public void setListAlbum(List<Album> albums){
         this.mFilterdata = albums;
+        this.albums = albums;
         this.notifyDataSetChanged();
     }
 
@@ -71,9 +72,9 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
             LayoutInflater layout = ((Activity) context).getLayoutInflater();
             row = layout.inflate(R.layout.album_list_item, null);
             myViewHolder = new AlbumViewHolder();
-            myViewHolder.imgAlbum = (ImageView) row.findViewById(R.id.ImgAlbum);
-            myViewHolder.txtNameAlbum = (TextView) row.findViewById(R.id.txtNameAlbum);
-            myViewHolder.txtItem = (TextView) row.findViewById(R.id.txtItem);
+            myViewHolder.imgAlbum =  row.findViewById(R.id.ImgAlbum);
+            myViewHolder.txtNameAlbum =  row.findViewById(R.id.txtNameAlbum);
+            myViewHolder.txtItem =  row.findViewById(R.id.txtItem);
             row.setTag(myViewHolder);
         } else {
             myViewHolder = (AlbumViewHolder) row.getTag();
@@ -85,7 +86,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
 
         Photo lastedPhoto =  album.getLastestPhotos();
         if (lastedPhoto == null) {
-            GlideApp.with(this.context).load(R.drawable.place_holder)
+            GlideApp.with(this.context).load(R.drawable.empty_album)
                     .fitCenter().into(myViewHolder.imgAlbum);
         } else {
             GlideApp.with(this.context).load(lastedPhoto.getUrl())
@@ -107,7 +108,7 @@ public class AlbumAdapter extends ArrayAdapter implements Observer,Filterable {
     }
 
     public List<Album> getAlbums() {
-        return albums;
+        return mFilterdata;
     }
 
     public void sortAlbum(final SortType type) {
