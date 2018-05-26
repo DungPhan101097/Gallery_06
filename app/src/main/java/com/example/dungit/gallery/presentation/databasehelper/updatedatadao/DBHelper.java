@@ -129,6 +129,14 @@ public class DBHelper extends Observable {
         filterListPhoto(listHiddenAlbum);
     }
 
+    ///TEMP
+    public void reloadData(){
+        loadData();
+
+        setChanged();
+        notifyObservers();
+    }
+
     public void convertListPhoto2ListPhotoSameDate(ArrayList<Photo> listPhoto) {
         listPhotoByDate.clear();
         for (Photo photo : listPhoto) {
@@ -309,4 +317,10 @@ public class DBHelper extends Observable {
         setChanged();
         notifyObservers();
     }
+
+    /*public void addPhoto(Photo photo){
+        listPhoto.add(photo);
+        setChanged();
+        notifyObservers();
+    }*/
 }

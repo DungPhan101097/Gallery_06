@@ -68,6 +68,8 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     
     private String img_Url;
 
+    private String img_Url;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
