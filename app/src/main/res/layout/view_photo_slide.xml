@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".presentation.uis.activities.PreviewPhotoActivity"
 >
-    <com.example.dungit.gallery.presentation.uis.activities.CustomViewPagerAdapterForPhotoView
+    <com.example.dungit.gallery.presentation.uis.adapters.CustomViewPagerAdapterForPhotoView
         android:id="@+id/pager_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -67,9 +67,6 @@ public class PreviewPhotoActivity extends AppCompatActivity {
     private static ViewPager.PageTransformer slideAnimation = null;
     
     private String img_Url;
-
-    private String img_Url;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,6 +151,12 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     }
                 };
                 inputDialog.showDialog();
+            }
+            break;
+            case R.id.act_vrview: {
+                Intent intent = new Intent(this,VRViewActivity.class);
+                intent.putExtra(VRViewActivity.IMG_PATH,photo.getFile().getAbsolutePath());
+                this.startActivity(intent);
             }
             break;
         }
