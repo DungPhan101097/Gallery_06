@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.dungit.gallery">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -34,5 +35,7 @@
         <activity android:name=".presentation.uis.activities.VRViewActivity"/>
 
     </application>
+    <uses-sdk android:minSdkVersion="15"
+        tools:overrideLibrary="com.google.vr.sdk.widgets.pano, com.google.vr.widgets.common, com.google.vr.cardboard" />
 
 </manifest>

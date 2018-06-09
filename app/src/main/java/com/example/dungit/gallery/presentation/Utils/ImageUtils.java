@@ -93,8 +93,12 @@ public class ImageUtils {
 
     public static void deletePhoto(Context context, Photo photo){
         context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Images.ImageColumns._ID + " = ?",
-                new String[]{String.valueOf(photo.getIdImg())});
+                MediaStore.Images.ImageColumns.DATA + " = ? OR "+ MediaStore.Images.ImageColumns._ID + "= ?",
+                new String[]{photo.getPathImg(),String.valueOf(photo.getIdImg())});
+
+        Intent scanFileIntent = new Intent(
+                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(photo.getFile()));
+        context.sendBroadcast(scanFileIntent);
 
     }
 

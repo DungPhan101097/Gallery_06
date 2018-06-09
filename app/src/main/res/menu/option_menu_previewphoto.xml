@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<item-->
+        <!--android:id="@+id/act_add_to_album"-->
+        <!--android:title="Thêm vào album"-->
+        <!--android:orderInCategory="100"-->
+        <!--/>-->
     <item
         android:id="@+id/act_Properties"
         android:title="Thông tin ảnh"
@@ -22,7 +27,7 @@
         />
     <item
         android:id="@+id/act_vrview"
-        android:title="VR View (Beta)"
+        android:title="Xem ảnh chế độ VR "
         android:orderInCategory="100"
         />
 

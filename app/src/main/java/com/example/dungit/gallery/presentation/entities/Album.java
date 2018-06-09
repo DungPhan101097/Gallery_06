@@ -68,6 +68,10 @@ public class Album {
         photos.add(img);
     }
 
+    public void addPhotoAtHead(Photo photo){
+        photos.addFirst(photo);
+    }
+
     public void clearAlbum(){
         this.photos.clear();
     }

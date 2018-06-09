@@ -9,6 +9,8 @@ import com.example.dungit.gallery.presentation.Utils.ImageUtils;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by DUNGIT on 4/18/2018.
@@ -79,6 +81,13 @@ public class Photo implements Serializable {
     }
 
     public String getUrl() {
+        if(idImg  == -1) {
+            try {
+                return file.toURL().toString();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
         return this.pathUrl;
     }
 

@@ -27,6 +27,7 @@ import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecycler
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by DUNGIT on 4/22/2018.
@@ -51,6 +52,7 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
         PictureFragment fragment = new PictureFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_LIST_PHOTO, lstPhoto);
+
         fragment.setArguments(bundle);
         return fragment;
     }

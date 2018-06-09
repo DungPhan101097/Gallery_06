@@ -1,6 +1,7 @@
 package com.example.dungit.gallery.presentation.uis.activities;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -25,6 +27,9 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.support.v7.widget.Toolbar;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.Scroller;
 import java.io.IOException;
@@ -34,8 +39,11 @@ import java.util.List;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelper;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
+import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.adapters.PhotoSlideAdapter;
+import com.example.dungit.gallery.presentation.uis.adapters.SelectAlbumAdapter;
 import com.example.dungit.gallery.presentation.uis.animation.FixedSpeedScroller;
 import com.example.dungit.gallery.presentation.uis.dialog.ConfirmDialog;
 import com.example.dungit.gallery.presentation.uis.dialog.InputDialog;
@@ -154,11 +162,19 @@ public class PreviewPhotoActivity extends AppCompatActivity {
             }
             break;
             case R.id.act_vrview: {
-                Intent intent = new Intent(this,VRViewActivity.class);
-                intent.putExtra(VRViewActivity.IMG_PATH,photo.getFile().getAbsolutePath());
-                this.startActivity(intent);
+                if (Build.VERSION.SDK_INT >= 19){
+                    Intent intent = new Intent(this,VRViewActivity.class);
+                    intent.putExtra(VRViewActivity.IMG_PATH,photo.getFile().getAbsolutePath());
+                    this.startActivity(intent);
+                } else{
+                    Toast.makeText(this,"Only enable in android 4.4 and above",Toast.LENGTH_SHORT);
+                }
             }
             break;
+//            case R.id.act_add_to_album: {
+//
+//            }
+//            break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -266,6 +282,38 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                     Intent myIntent = new Intent(PreviewPhotoActivity.this, EditPhoto.class);
                     myIntent.putExtra("filePath",img_Url); //Optional parameters
                     PreviewPhotoActivity.this.startActivity(myIntent);
+                }else if(id == R.id.photo_add_to_album){
+                    final Dialog dialog = new Dialog(PreviewPhotoActivity.this);
+                    dialog.setContentView(R.layout.select_album_dialog);
+                    View view = dialog.getWindow().getDecorView();
+                    final ListView listView = view.findViewById(R.id.listAlbumSelect);
+                    Button btnCancelMove = view.findViewById(R.id.btnCancelMove);
+                    btnCancelMove.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog.cancel();
+                        }
+                    });
+                    final DBHelper dbHelper =  MainActivity.getDBHelper();
+                    SelectAlbumAdapter albumAdapter_ = new SelectAlbumAdapter(PreviewPhotoActivity.this
+                            , dbHelper.getListAlbum()) {
+                        @Override
+                        public void onRowClick(Album clickedAlbum) {
+                            List<Photo> photos= clickedAlbum.getPhotos();
+                            for(Photo photo_ : photos){
+                                if(photo_.getIdImg() == photo.getIdImg()){
+                                    Toast.makeText(PreviewPhotoActivity.this,"Photo already in album",Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+                            //ImageUtils.deletePhoto(PreviewPhotoActivity.this,photo);
+                            //dbHelper.deletePhoto(photo);
+                            dbHelper.addPhotoToAlbum(photo,clickedAlbum);
+                            dialog.cancel();
+                        }
+                    };
+                    listView.setAdapter(albumAdapter_);
+                    dialog.show();
                 }
                 return false;
             }

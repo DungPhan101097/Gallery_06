@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoActivity;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -88,7 +91,7 @@ public class AdapterInnerRecyclerView
                 int imgPostion = 0;
                 if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
-                    ArrayList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
+                    LinkedList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
                     if (mFilterdata != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(mFilterdata.get(position));
@@ -200,6 +203,7 @@ public class AdapterInnerRecyclerView
             txtNAme = itemView.findViewById(R.id.txtName);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
+            //itemView.setOnCreateContextMenuListener(this);
         }
 
         public void setItemClickListener(ItemClickListener itemClickListener) {
@@ -214,6 +218,7 @@ public class AdapterInnerRecyclerView
         @Override
         public boolean onLongClick(View view) {
             itemClickListener.onLongClick(view, getAdapterPosition());
+            //Log.i("ABC","LONG CLIK");
             return true;
         }
     }

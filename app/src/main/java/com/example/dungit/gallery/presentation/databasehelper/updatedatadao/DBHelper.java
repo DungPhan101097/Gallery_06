@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -42,13 +43,13 @@ public class DBHelper extends Observable {
     private static final String DATA = MediaStore.Images.Media.DATA;
     private static final String[] IMAGE_PROJECTION_ALBUM =
             new String[]{
-                    ID, DATE_TAKEN, BUCKET_NAME,BUCKET_ID,DISPLAY_NAME,SIZE,DESCRIPTION, DATA
+                    ID, DATE_TAKEN, BUCKET_NAME, BUCKET_ID, DISPLAY_NAME, SIZE, DESCRIPTION, DATA
             };
     private static final String USER_ALBUM_FLODER
             = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Albums06/";
 
     private ArrayList<ListPhotoSameDate> listPhotoByDate = new ArrayList<>();
-    private ArrayList<Photo> listPhoto = new ArrayList<>();
+    private LinkedList<Photo> listPhoto = new LinkedList<>();
 
     private LinkedList<Album> listAlbum = new LinkedList<>();
     private LinkedList<Album> listHiddenAlbum = new LinkedList<>();
@@ -60,10 +61,10 @@ public class DBHelper extends Observable {
     }
 
     public ArrayList<ListPhotoSameDate> getListPhotoByDate() {
-        return listPhotoByDate;
+        return  listPhotoByDate;
     }
 
-    public ArrayList<Photo> getListPhoto() {
+    public LinkedList<Photo> getListPhoto() {
         return listPhoto;
     }
 
@@ -91,7 +92,7 @@ public class DBHelper extends Observable {
         String date = null;
 
         PhotoDatabaseHelper databaseHelper = new PhotoDatabaseHelper(context);
-        HashMap<Long,String> descriptionMap =databaseHelper.getPhotoDescriptionMap();
+        HashMap<Long, String> descriptionMap = databaseHelper.getPhotoDescriptionMap();
         HashMap<Long, LinkedList<Photo>> albumMap = new HashMap<>();
 
         while (imgCursor.moveToNext()) {
@@ -109,11 +110,11 @@ public class DBHelper extends Observable {
             int width = options.outWidth;
             int height = options.outHeight;
 
-            if(descriptionMap.containsKey(id)){
+            if (descriptionMap.containsKey(id)) {
                 descriptImg = descriptionMap.get(id);
             }
 
-            Photo curPhoto = new Photo(id, dateTaken, albumId, albumName, new File(filePath),width,height,descriptImg);
+            Photo curPhoto = new Photo(id, dateTaken, albumId, albumName, new File(filePath), width, height, descriptImg);
             listPhoto.add(curPhoto);
 
             if (albumMap.containsKey(albumId)) {
@@ -130,14 +131,14 @@ public class DBHelper extends Observable {
     }
 
     ///TEMP
-    public void reloadData(){
+    public void reloadData() {
         loadData();
 
         setChanged();
         notifyObservers();
     }
 
-    public void convertListPhoto2ListPhotoSameDate(ArrayList<Photo> listPhoto) {
+    public void convertListPhoto2ListPhotoSameDate(LinkedList<Photo> listPhoto) {
         listPhotoByDate.clear();
         for (Photo photo : listPhoto) {
             ListPhotoSameDate curListPhotoByDate = checkDate(listPhotoByDate, photo.getDateTaken());
@@ -277,18 +278,62 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
+    public void addPhotoToAlbum(final Photo photo, final Album desAlbum) {
+        for (Album album : listAlbum) {
+            album.getPhotos().remove(photo);
+        }
+        //desAlbum.getPhotos().remove(photo);
+        File nAlbumFile = desAlbum.getFile();
+        File filePhoto = photo.getFile();
+        final File newFile = new File(nAlbumFile, filePhoto.getName());
+        if (filePhoto.renameTo(newFile)) {
+//            Intent scanFileIntent = new Intent(
+//                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(newFile));
+//            context.sendBroadcast(scanFileIntent);
+            MediaScannerConnection.scanFile(context,
+                    new String[]{newFile.getAbsolutePath()},
+                    null,
+                    null);
+
+
+            photo.setFile(newFile);
+            desAlbum.addPhotoAtHead(photo);
+            setChanged();
+            notifyObservers();
+
+        }
+        /*Cursor imgCursor= context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                ,IMAGE_PROJECTION_ALBUM,DATA  +"= ?",new String[]{newFile.getAbsolutePath()},null);
+        final int idIndex = imgCursor.getColumnIndex(ID);
+        final int dateIndex = imgCursor.getColumnIndex(DATE_TAKEN);
+        final int albumNameIndex = imgCursor.getColumnIndex(BUCKET_NAME);
+        final int albumIdIndex = imgCursor.getColumnIndex(BUCKET_ID);
+        final int dataIndex = imgCursor.getColumnIndex(DATA);
+        if(imgCursor.moveToFirst()){
+            final String filePath = imgCursor.getString(dataIndex);
+            final long id = imgCursor.getLong(idIndex);
+            final long dateTaken = imgCursor.getLong(dateIndex);
+            final String albumName = imgCursor.getString(albumNameIndex);
+            final long albumId = imgCursor.getLong(albumIdIndex);
+
+        }*/
+    }
+
     public void moveAlbum(Album movedALbum, Album desAlbum) {
         File nAlbumFile = desAlbum.getFile();
-
         LinkedList<Photo> photos = movedALbum.getPhotos();
-
         for (Photo photo : photos) {
             File filePhoto = photo.getFile();
             File newFile = new File(nAlbumFile, filePhoto.getName());
             if (filePhoto.renameTo(newFile)) {
-                Intent scanFileIntent = new Intent(
-                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile));
-                context.sendBroadcast(scanFileIntent);
+//                Intent scanFileIntent = new Intent(
+//                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile));
+//                context.sendBroadcast(scanFileIntent);
+
+                MediaScannerConnection.scanFile(context,
+                        new String[]{newFile.getAbsolutePath()},
+                        null,
+                        null);
                 photo.setFile(newFile);
                 desAlbum.addPhoto(photo);
             }
@@ -297,7 +342,6 @@ public class DBHelper extends Observable {
                 MediaStore.Images.ImageColumns.BUCKET_ID + " = ?",
                 new String[]{String.valueOf(movedALbum.getId())});
         movedALbum.clearAlbum();
-
         setChanged();
         notifyObservers();
     }
@@ -307,10 +351,9 @@ public class DBHelper extends Observable {
     }
 
 
-
-    public void deletePhoto(Photo photo){
+    public void deletePhoto(Photo photo) {
         listPhoto.remove(photo);
-        for (Album album: listAlbum) {
+        for (Album album : listAlbum) {
             album.getPhotos().remove(photo);
         }
         convertListPhoto2ListPhotoSameDate(listPhoto);
@@ -318,9 +361,50 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
-    /*public void addPhoto(Photo photo){
-        listPhoto.add(photo);
-        setChanged();
-        notifyObservers();
-    }*/
+    private static final File EDITED_FOLDER= new File("/storage/emulated/0/DCIM/Edited/");
+    public void addEdittedPhoto(File file){
+        if(!file.exists() ) return;
+        if(!EDITED_FOLDER.exists()){
+            EDITED_FOLDER.mkdirs();
+            Album album = new Album(EDITED_FOLDER.hashCode(),"Edited");
+            listAlbum.add(album);
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        int width = options.outWidth;
+        int height = options.outHeight;
+
+        Photo photo = new Photo(
+                -1, new Date().getTime()
+                ,EDITED_FOLDER.hashCode()
+                ,"Edited",file,width,height,"");
+        Album album = null;
+        for (Album album_ : listAlbum){
+            if(album_.getFile().equals(EDITED_FOLDER)){
+                album = album_;
+                break;
+            }
+        }
+        boolean isHidden = false;
+        if(album == null){
+            album = new Album(EDITED_FOLDER.hashCode(),"Edited");
+            for (Album album_ : this.listHiddenAlbum){
+                if(album_.getFile().equals(EDITED_FOLDER)){
+                    isHidden = true;
+                    break;
+                }
+            }
+        }
+        album.addPhotoAtHead(photo);
+        if(!isHidden){
+            listAlbum.add(album);
+            listPhoto.addFirst(photo);
+            convertListPhoto2ListPhotoSameDate(listPhoto);
+            setChanged();
+            notifyObservers();
+        }
+
+    }
 }
