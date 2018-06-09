@@ -66,13 +66,12 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
 
             if (resultPath != null) {
                 // Scan result file
-//                File file =  new File(resultPath);
+                File file = new File(resultPath);
 //                Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 //                Uri contentUri = Uri.fromFile(file);
 //                scanIntent.setData(contentUri);
 //                sendBroadcast(scanIntent);
-                File file = new File(resultPath);
-                if(file.exists()) {
+                if (file.exists()) {
                     MediaScannerConnection.scanFile(this,
                             new String[]{file.getAbsolutePath()},
                             null,
