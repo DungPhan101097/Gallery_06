@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.dungit.gallery.R;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
 import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoOfAlbumActivity;
@@ -78,7 +79,7 @@ public class AlbumFragment extends Fragment implements SearchView.OnQueryTextLis
         listAlbum = rootView.findViewById(R.id.listAlbum);
         albumAdapter = new AlbumAdapter(context, albums);
 
-        main.getDBHelper().addObserver(albumAdapter);
+        DBHelper.getInstance().addObserver(albumAdapter);
 
         listAlbum.setAdapter(albumAdapter);
 
@@ -87,7 +88,7 @@ public class AlbumFragment extends Fragment implements SearchView.OnQueryTextLis
         footerV.setOnClickListener(null);
         listAlbum.addFooterView(footerV);
 
-        albumController = new AlbumController(context, albumAdapter, main.getDBHelper());
+        albumController = new AlbumController(context, albumAdapter, DBHelper.getInstance());
 
         FloatingActionButton fab = rootView.findViewById(R.id.fabAlbum);
         fab.setOnClickListener(new View.OnClickListener() {

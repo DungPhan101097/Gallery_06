@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.dungit.gallery.R;
+import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
 import com.example.dungit.gallery.presentation.entities.EMODE;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
@@ -75,8 +76,8 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
         adapterRecyclerView = new AdapterRecyclerView(main, lstPhotoSameDate);
         adapterInnerRecyclerView = new AdapterInnerRecyclerView(main, lstPhoto);
 
-        main.getDBHelper().addObserver(adapterInnerRecyclerView);
-        main.getDBHelper().addObserver(adapterRecyclerView);
+        DBHelper.getInstance().addObserver(adapterInnerRecyclerView);
+        DBHelper.getInstance().addObserver(adapterRecyclerView);
         setHasOptionsMenu(true);
     }
 

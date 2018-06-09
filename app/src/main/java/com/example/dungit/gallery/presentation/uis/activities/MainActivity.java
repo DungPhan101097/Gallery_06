@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dbHelper = new DBHelper(this);
+
+        dbHelper = DBHelper.getInstance();
+        dbHelper.setContext(this);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -57,6 +59,22 @@ public class MainActivity extends AppCompatActivity{
             // Doc du lieu.
             dbHelper.loadData();
             initViews();
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                Toast.makeText(this, "Application have to need permission to access photo!",
+                        Toast.LENGTH_SHORT).show();
+
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSION_EXTERNAL_STORAGE);
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSION_EXTERNAL_STORAGE);
+            }
         }
     }
 
@@ -137,10 +155,6 @@ public class MainActivity extends AppCompatActivity{
         } else {
             viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
         }
-    }
-    public static DBHelper getDBHelper() {
-
-        return dbHelper;
     }
 
     @Override

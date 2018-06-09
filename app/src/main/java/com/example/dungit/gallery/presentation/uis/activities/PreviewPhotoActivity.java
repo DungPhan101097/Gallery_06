@@ -267,7 +267,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                                     onBackPressed();
                                 else
                                     mPager.getAdapter().notifyDataSetChanged();
-                                MainActivity.getDBHelper().deletePhoto(photo);
+                                DBHelper.getInstance().deletePhoto(photo);
                                 ImageUtils.deletePhoto(PreviewPhotoActivity.this,photo);
                             }
 
@@ -294,7 +294,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                             dialog.cancel();
                         }
                     });
-                    final DBHelper dbHelper =  MainActivity.getDBHelper();
+                    final DBHelper dbHelper =  DBHelper.getInstance();
                     SelectAlbumAdapter albumAdapter_ = new SelectAlbumAdapter(PreviewPhotoActivity.this
                             , dbHelper.getListAlbum()) {
                         @Override

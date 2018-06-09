@@ -10,12 +10,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 
 import com.example.dungit.gallery.presentation.Utils.EmptyFolderFileFilter;
+import com.example.dungit.gallery.presentation.Utils.ImageUtils;
 import com.example.dungit.gallery.presentation.databasehelper.PhotoDatabaseHelper;
 import com.example.dungit.gallery.presentation.entities.Album;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,11 +29,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+import static com.example.dungit.gallery.presentation.Utils.ImageUtils.getIDImgFromURL;
+
 /**
  * Created by DUNGIT on 4/28/2018.
  */
 
 public class DBHelper extends Observable {
+
+    private static DBHelper dbHelper = new DBHelper();
+
+    public static DBHelper getInstance(){
+        return dbHelper;
+    }
+
+    public static void SetContext(Context context){
+        dbHelper.context = context;
+    }
+
+
     private static final Uri EXTERNAL_URI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     private static final String ID = MediaStore.Images.ImageColumns._ID;
     private static final String DATE_TAKEN = MediaStore.Images.ImageColumns.DATE_TAKEN;
@@ -56,8 +72,9 @@ public class DBHelper extends Observable {
 
     private Context context;
 
-    public DBHelper(Context context) {
-        this.context = context;
+
+    private DBHelper() {
+        this.context = null;
     }
 
     public ArrayList<ListPhotoSameDate> getListPhotoByDate() {
@@ -150,6 +167,10 @@ public class DBHelper extends Observable {
                 curListPhotoByDate.addPhoto(photo);
             }
         }
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
     }
 
     private void filterListPhoto(List<Album> rejectedList) {
@@ -287,36 +308,14 @@ public class DBHelper extends Observable {
         File filePhoto = photo.getFile();
         final File newFile = new File(nAlbumFile, filePhoto.getName());
         if (filePhoto.renameTo(newFile)) {
-//            Intent scanFileIntent = new Intent(
-//                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(newFile));
-//            context.sendBroadcast(scanFileIntent);
-            MediaScannerConnection.scanFile(context,
-                    new String[]{newFile.getAbsolutePath()},
-                    null,
-                    null);
-
-
+            ImageUtils.insertPhoto(context,photo,newFile);
             photo.setFile(newFile);
             desAlbum.addPhotoAtHead(photo);
             setChanged();
             notifyObservers();
 
         }
-        /*Cursor imgCursor= context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                ,IMAGE_PROJECTION_ALBUM,DATA  +"= ?",new String[]{newFile.getAbsolutePath()},null);
-        final int idIndex = imgCursor.getColumnIndex(ID);
-        final int dateIndex = imgCursor.getColumnIndex(DATE_TAKEN);
-        final int albumNameIndex = imgCursor.getColumnIndex(BUCKET_NAME);
-        final int albumIdIndex = imgCursor.getColumnIndex(BUCKET_ID);
-        final int dataIndex = imgCursor.getColumnIndex(DATA);
-        if(imgCursor.moveToFirst()){
-            final String filePath = imgCursor.getString(dataIndex);
-            final long id = imgCursor.getLong(idIndex);
-            final long dateTaken = imgCursor.getLong(dateIndex);
-            final String albumName = imgCursor.getString(albumNameIndex);
-            final long albumId = imgCursor.getLong(albumIdIndex);
 
-        }*/
     }
 
     public void moveAlbum(Album movedALbum, Album desAlbum) {
@@ -326,14 +325,7 @@ public class DBHelper extends Observable {
             File filePhoto = photo.getFile();
             File newFile = new File(nAlbumFile, filePhoto.getName());
             if (filePhoto.renameTo(newFile)) {
-//                Intent scanFileIntent = new Intent(
-//                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(newFile));
-//                context.sendBroadcast(scanFileIntent);
-
-                MediaScannerConnection.scanFile(context,
-                        new String[]{newFile.getAbsolutePath()},
-                        null,
-                        null);
+                ImageUtils.insertPhoto(context,photo,newFile);
                 photo.setFile(newFile);
                 desAlbum.addPhoto(photo);
             }
@@ -366,8 +358,6 @@ public class DBHelper extends Observable {
         if(!file.exists() ) return;
         if(!EDITED_FOLDER.exists()){
             EDITED_FOLDER.mkdirs();
-            Album album = new Album(EDITED_FOLDER.hashCode(),"Edited");
-            listAlbum.add(album);
         }
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -380,6 +370,13 @@ public class DBHelper extends Observable {
                 -1, new Date().getTime()
                 ,EDITED_FOLDER.hashCode()
                 ,"Edited",file,width,height,"");
+
+        Uri uri= ImageUtils.saveImageToGallery(context.getContentResolver(),file);
+        long id = getIDImgFromURL(uri.toString());
+        photo.setIdImg(id);
+        photo.setPathUrl(uri.toString());
+        photo.setFile(file);
+
         Album album = null;
         for (Album album_ : listAlbum){
             if(album_.getFile().equals(EDITED_FOLDER)){

@@ -91,7 +91,7 @@ public class AdapterInnerRecyclerView
                 int imgPostion = 0;
                 if (context instanceof MainActivity) {
                     MainActivity mainActivity = (MainActivity) context;
-                    LinkedList<Photo> photos = mainActivity.getDBHelper().getListPhoto();
+                    LinkedList<Photo> photos = DBHelper.getInstance().getListPhoto();
                     if (mFilterdata != photos) {
                         PreviewPhotoActivity.setPhotos(photos);
                         imgPostion = photos.indexOf(mFilterdata.get(position));

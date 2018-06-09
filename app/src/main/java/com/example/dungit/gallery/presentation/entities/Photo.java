@@ -47,6 +47,9 @@ public class Photo implements Serializable {
         this.descriptImg = descriptImg;
     }
 
+    public void setPathUrl(String pathUrl) {
+        this.pathUrl = pathUrl;
+    }
 
     public long getIdImg() {
         return idImg;
@@ -81,7 +84,7 @@ public class Photo implements Serializable {
     }
 
     public String getUrl() {
-        if(idImg  == -1) {
+        if(pathUrl.isEmpty()) {
             try {
                 return file.toURL().toString();
             } catch (MalformedURLException e) {

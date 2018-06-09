@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -76,7 +77,7 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
                             new String[]{file.getAbsolutePath()},
                             null,
                             null);
-                    MainActivity.getDBHelper().addEdittedPhoto(file);
+                    DBHelper.getInstance().addEdittedPhoto(file);
                 }
             }
 
