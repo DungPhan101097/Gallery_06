@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -31,8 +32,9 @@
         <activity android:name=".presentation.uis.activities.PreviewPhotoActivity" />
         <activity android:name=".presentation.uis.controller.ZoomInZoomOut" />
         <activity android:name=".presentation.uis.activities.PreviewPhotoOfAlbumActivity" />
-        <activity android:name=".presentation.uis.activities.SettingActivity"></activity>
-        <activity android:name=".presentation.uis.activities.EditPhoto"/>
+        <activity android:name=".presentation.uis.activities.SettingActivity"/>
+        <activity android:name=".presentation.uis.activities.EditPhotoActivity"/>
+        <activity android:name=".presentation.uis.activities.TakePhotoActivity"/>
         <activity android:name=".presentation.uis.activities.VRViewActivity"/>
 
     </application>

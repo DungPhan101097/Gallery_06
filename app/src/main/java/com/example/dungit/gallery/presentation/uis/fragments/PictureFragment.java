@@ -4,6 +4,7 @@ package com.example.dungit.gallery.presentation.uis.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.example.dungit.gallery.R;
 import com.example.dungit.gallery.presentation.databasehelper.updatedatadao.DBHelper;
@@ -23,7 +25,9 @@ import com.example.dungit.gallery.presentation.entities.EMODE;
 import com.example.dungit.gallery.presentation.entities.ListPhotoSameDate;
 import com.example.dungit.gallery.presentation.entities.Photo;
 import com.example.dungit.gallery.presentation.uis.activities.MainActivity;
+import com.example.dungit.gallery.presentation.uis.activities.PreviewPhotoOfAlbumActivity;
 import com.example.dungit.gallery.presentation.uis.activities.SettingActivity;
+import com.example.dungit.gallery.presentation.uis.activities.TakePhotoActivity;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterInnerRecyclerView;
 import com.example.dungit.gallery.presentation.uis.adapters.AdapterRecyclerView;
 
@@ -82,7 +86,7 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.picture_fragment, container, false);
 
@@ -92,6 +96,15 @@ public class PictureFragment extends Fragment implements SearchView.OnQueryTextL
         rvWrapper.setLayoutManager(linearLayoutManager);
         rvWrapper.setAdapter(adapterRecyclerView);
 
+
+        FloatingActionButton fab = view.findViewById(R.id.fabCamera);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), TakePhotoActivity.class);
+                getContext().startActivity(intent);
+            }
+        });
         return view;
     }
 

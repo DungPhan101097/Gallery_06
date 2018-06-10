@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+import ly.img.android.sdk.models.constant.Directory;
+
 import static com.example.dungit.gallery.presentation.Utils.ImageUtils.getIDImgFromURL;
 
 /**
@@ -39,11 +41,11 @@ public class DBHelper extends Observable {
 
     private static DBHelper dbHelper = new DBHelper();
 
-    public static DBHelper getInstance(){
+    public static DBHelper getInstance() {
         return dbHelper;
     }
 
-    public static void SetContext(Context context){
+    public static void SetContext(Context context) {
         dbHelper.context = context;
     }
 
@@ -78,7 +80,7 @@ public class DBHelper extends Observable {
     }
 
     public ArrayList<ListPhotoSameDate> getListPhotoByDate() {
-        return  listPhotoByDate;
+        return listPhotoByDate;
     }
 
     public LinkedList<Photo> getListPhoto() {
@@ -308,7 +310,7 @@ public class DBHelper extends Observable {
         File filePhoto = photo.getFile();
         final File newFile = new File(nAlbumFile, filePhoto.getName());
         if (filePhoto.renameTo(newFile)) {
-            ImageUtils.insertPhoto(context,photo,newFile);
+            ImageUtils.insertPhoto(context, photo, newFile);
             photo.setFile(newFile);
             desAlbum.addPhotoAtHead(photo);
             setChanged();
@@ -325,7 +327,7 @@ public class DBHelper extends Observable {
             File filePhoto = photo.getFile();
             File newFile = new File(nAlbumFile, filePhoto.getName());
             if (filePhoto.renameTo(newFile)) {
-                ImageUtils.insertPhoto(context,photo,newFile);
+                ImageUtils.insertPhoto(context, photo, newFile);
                 photo.setFile(newFile);
                 desAlbum.addPhoto(photo);
             }
@@ -353,10 +355,11 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
-    private static final File EDITED_FOLDER= new File("/storage/emulated/0/DCIM/Edited/");
-    public void addEdittedPhoto(File file){
-        if(!file.exists() ) return;
-        if(!EDITED_FOLDER.exists()){
+    private static final File EDITED_FOLDER = new File("/storage/emulated/0/DCIM/Edited");
+
+    public void addEdittedPhoto(File file) {
+        if (!file.exists()) return;
+        if (!EDITED_FOLDER.exists()) {
             EDITED_FOLDER.mkdirs();
         }
 
@@ -368,34 +371,34 @@ public class DBHelper extends Observable {
 
         Photo photo = new Photo(
                 -1, new Date().getTime()
-                ,EDITED_FOLDER.hashCode()
-                ,"Edited",file,width,height,"");
+                , EDITED_FOLDER.hashCode()
+                , "Edited", file, width, height, "");
 
-        Uri uri= ImageUtils.saveImageToGallery(context.getContentResolver(),file);
+        Uri uri = ImageUtils.saveImageToGallery(context.getContentResolver(), file);
         long id = getIDImgFromURL(uri.toString());
         photo.setIdImg(id);
         photo.setPathUrl(uri.toString());
         photo.setFile(file);
 
         Album album = null;
-        for (Album album_ : listAlbum){
-            if(album_.getFile().equals(EDITED_FOLDER)){
+        for (Album album_ : listAlbum) {
+            if (album_.getFile().equals(EDITED_FOLDER)) {
                 album = album_;
                 break;
             }
         }
         boolean isHidden = false;
-        if(album == null){
-            album = new Album(EDITED_FOLDER.hashCode(),"Edited");
-            for (Album album_ : this.listHiddenAlbum){
-                if(album_.getFile().equals(EDITED_FOLDER)){
+        if (album == null) {
+            album = new Album(EDITED_FOLDER.hashCode(), "Edited");
+            for (Album album_ : this.listHiddenAlbum) {
+                if (album_.getFile().equals(EDITED_FOLDER)) {
                     isHidden = true;
                     break;
                 }
             }
         }
         album.addPhotoAtHead(photo);
-        if(!isHidden){
+        if (!isHidden) {
             listAlbum.add(album);
             listPhoto.addFirst(photo);
             convertListPhoto2ListPhotoSameDate(listPhoto);
@@ -404,4 +407,53 @@ public class DBHelper extends Observable {
         }
 
     }
+
+    private static final File CAMERA_FOLDER = new File("/storage/emulated/0/DCIM/Camera");
+
+    public void addCameraPhoto(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        int width = options.outWidth;
+        int height = options.outHeight;
+
+        Photo photo = new Photo(
+                -1, new Date().getTime()
+                , CAMERA_FOLDER.hashCode()
+                , "Edited", file, width, height, "");
+
+        Uri uri = ImageUtils.saveImageToGallery(context.getContentResolver(), file);
+
+        long id = getIDImgFromURL(uri.toString());
+        photo.setIdImg(id);
+        photo.setPathUrl(uri.toString());
+        photo.setFile(file);
+
+        Album album = null;
+        for (Album album_ : listAlbum) {
+            if (album_.getFile().equals(CAMERA_FOLDER)) {
+                album = album_;
+                break;
+            }
+        }
+        boolean isHidden = false;
+        for (Album album_ : this.listHiddenAlbum) {
+            if (album_.getFile().equals(EDITED_FOLDER)) {
+                isHidden = true;
+                album = album_;
+                break;
+            }
+        }
+
+        album.addPhotoAtHead(photo);
+        if (!isHidden) {
+            listAlbum.add(album);
+            listPhoto.addFirst(photo);
+            convertListPhoto2ListPhotoSameDate(listPhoto);
+            setChanged();
+            notifyObservers();
+        }
+
+    }
+
 }

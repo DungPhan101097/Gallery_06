@@ -2,12 +2,7 @@ package com.example.dungit.gallery.presentation.uis.activities;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.WallpaperManager;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,11 +24,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.support.v7.widget.Toolbar;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.Scroller;
-import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.List;
 
 
@@ -279,7 +272,7 @@ public class PreviewPhotoActivity extends AppCompatActivity {
                 }
                 else if(id == R.id.photo_action_edit)
                 {
-                    Intent myIntent = new Intent(PreviewPhotoActivity.this, EditPhoto.class);
+                    Intent myIntent = new Intent(PreviewPhotoActivity.this, EditPhotoActivity.class);
                     myIntent.putExtra("filePath",img_Url); //Optional parameters
                     PreviewPhotoActivity.this.startActivity(myIntent);
                 }else if(id == R.id.photo_add_to_album){

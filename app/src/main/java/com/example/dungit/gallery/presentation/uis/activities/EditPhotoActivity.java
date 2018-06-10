@@ -29,7 +29,7 @@ import ly.img.android.ui.utilities.PermissionRequest;
 
 //Create by TuNguyen
 
-public class EditPhoto extends Activity implements PermissionRequest.Response {
+public class EditPhotoActivity extends Activity implements PermissionRequest.Response {
 
     private static final String FOLDER = "Edited";
     public static int CAMERA_PREVIEW_RESULT = 1;
@@ -45,7 +45,6 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
         settingsList
                 .getSettingsModel(EditorLoadSettings.class)
                 .setImageSourcePath(myPicture,true) // Load with delete protection true!
-
                 .getSettingsModel(EditorSaveSettings.class)
                 .setExportDir(Directory.DCIM, FOLDER)
                 .setExportPrefix("result_")
@@ -97,8 +96,6 @@ public class EditPhoto extends Activity implements PermissionRequest.Response {
         onBackPressed();
     }
 
-
-    // Important permission request for Android 6.0 and above, don't forget this!
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         PermissionRequest.onRequestPermissionsResult(requestCode, permissions, grantResults);
