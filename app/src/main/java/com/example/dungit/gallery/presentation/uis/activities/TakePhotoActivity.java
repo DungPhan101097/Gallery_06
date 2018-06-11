@@ -62,10 +62,6 @@ public class TakePhotoActivity extends Activity implements PermissionRequest.Res
                 // Scan result file
                 File file = new File(resultPath);
                 if (file.exists()) {
-                    MediaScannerConnection.scanFile(this,
-                            new String[]{file.getAbsolutePath()},
-                            null,
-                            null);
                     DBHelper.getInstance().addCameraPhoto(file);
                 }
             }

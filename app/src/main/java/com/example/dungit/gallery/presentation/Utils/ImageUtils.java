@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -102,12 +103,11 @@ public class ImageUtils {
 
     public static void deletePhoto(Context context, Photo photo) {
         context.getContentResolver().delete(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Images.ImageColumns.DATA + " = ? OR " + MediaStore.Images.ImageColumns._ID + "= ?",
+                MediaStore.Images.ImageColumns.DATA + " = ? OR " + MediaStore.Images.ImageColumns._ID + "= ? OR ",
                 new String[]{photo.getPathImg(), String.valueOf(photo.getIdImg())});
-
-        Intent scanFileIntent = new Intent(
-                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(photo.getFile()));
-        context.sendBroadcast(scanFileIntent);
+//        Intent scanFileIntent = new Intent(
+//                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(photo.getFile()));
+//        context.sendBroadcast(scanFileIntent);
     }
 
     public static void sendPhoto(Context context, Photo photo) {
@@ -150,13 +150,32 @@ public class ImageUtils {
         if (!file.exists()) return false;
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DATA, file.getAbsolutePath());
+
         return context.getContentResolver().update(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values,
         MediaStore.MediaColumns.DATA + "='" + photo.getPathImg() + "'", null) == 1;
     }
 
 
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } catch (Exception e) {
+            return "";
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
+
+//src ; https://gist.github.com/benny-shotvibe/1e0d745b7bc68a9c3256
     // Inspired by:
 // http://stackoverflow.com/questions/8560501/android-save-image-into-gallery/8722494#8722494
 // https://gist.github.com/samkirton/0242ba81d7ca00b475b9
@@ -167,6 +186,7 @@ public class ImageUtils {
         values.put(MediaStore.Images.Media.DISPLAY_NAME, file.getName());
         values.put(MediaStore.Images.Media.DESCRIPTION, "");
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        //values.put(MediaStore.Images.Media.DATA,file.getAbsolutePath());
         // Add the date meta data to ensure the image is added at the front of the gallery
         long millis = System.currentTimeMillis();
         values.put(MediaStore.Images.Media.DATE_ADDED, millis / 1000L);
@@ -180,7 +200,6 @@ public class ImageUtils {
 
             if (file.exists()) {
                 final int BUFFER_SIZE = 1024;
-
                 FileInputStream fileStream = new FileInputStream(file);
                 try {
                     OutputStream imageOut = cr.openOutputStream(url);

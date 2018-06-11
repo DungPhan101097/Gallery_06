@@ -355,12 +355,12 @@ public class DBHelper extends Observable {
         notifyObservers();
     }
 
-    private static final File EDITED_FOLDER = new File("/storage/emulated/0/DCIM/Edited");
+    private static final File PICTURES_FOLDER = new File("/storage/emulated/0/Pictures");
 
     public void addEdittedPhoto(File file) {
         if (!file.exists()) return;
-        if (!EDITED_FOLDER.exists()) {
-            EDITED_FOLDER.mkdirs();
+        if (!PICTURES_FOLDER.exists()) {
+            PICTURES_FOLDER.mkdirs();
         }
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -371,27 +371,77 @@ public class DBHelper extends Observable {
 
         Photo photo = new Photo(
                 -1, new Date().getTime()
-                , EDITED_FOLDER.hashCode()
-                , "Edited", file, width, height, "");
+                , PICTURES_FOLDER.hashCode()
+                ,PICTURES_FOLDER.getName() , file, width, height, "");
 
         Uri uri = ImageUtils.saveImageToGallery(context.getContentResolver(), file);
         long id = getIDImgFromURL(uri.toString());
+        File newFile = new File(ImageUtils.getRealPathFromURI(context,uri));
         photo.setIdImg(id);
         photo.setPathUrl(uri.toString());
-        photo.setFile(file);
+        photo.setFile(newFile);
 
         Album album = null;
         for (Album album_ : listAlbum) {
-            if (album_.getFile().equals(EDITED_FOLDER)) {
+            if (album_.getFile().equals(PICTURES_FOLDER)) {
                 album = album_;
                 break;
             }
         }
         boolean isHidden = false;
         if (album == null) {
-            album = new Album(EDITED_FOLDER.hashCode(), "Edited");
+            album = new Album(PICTURES_FOLDER.hashCode(), "Edited");
             for (Album album_ : this.listHiddenAlbum) {
-                if (album_.getFile().equals(EDITED_FOLDER)) {
+                if (album_.getFile().equals(PICTURES_FOLDER)) {
+                    isHidden = true;
+                    break;
+                }
+            }
+        }
+
+        album.addPhotoAtHead(photo);
+        if (!isHidden) {
+            listAlbum.add(album);
+            listPhoto.addFirst(photo);
+            convertListPhoto2ListPhotoSameDate(listPhoto);
+            setChanged();
+            notifyObservers();
+        }
+        file.delete();
+    }
+
+
+    public void addCameraPhoto(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        int width = options.outWidth;
+        int height = options.outHeight;
+
+        Photo photo = new Photo(
+                -1, new Date().getTime()
+                , PICTURES_FOLDER.hashCode()
+                , PICTURES_FOLDER.getName(), file, width, height, "");
+
+        Uri uri = ImageUtils.saveImageToGallery(context.getContentResolver(), file);
+        File newFile = new File(ImageUtils.getRealPathFromURI(context,uri));
+        long id = getIDImgFromURL(uri.toString());
+        photo.setIdImg(id);
+        photo.setPathUrl(uri.toString());
+        photo.setFile(newFile);
+
+        Album album = null;
+        for (Album album_ : listAlbum) {
+            if (album_.getFile().equals(PICTURES_FOLDER)) {
+                album = album_;
+                break;
+            }
+        }
+        boolean isHidden = false;
+        if (album == null) {
+            album = new Album(PICTURES_FOLDER.hashCode(), "Edited");
+            for (Album album_ : this.listHiddenAlbum) {
+                if (album_.getFile().equals(PICTURES_FOLDER)) {
                     isHidden = true;
                     break;
                 }
@@ -405,55 +455,7 @@ public class DBHelper extends Observable {
             setChanged();
             notifyObservers();
         }
-
-    }
-
-    private static final File CAMERA_FOLDER = new File("/storage/emulated/0/DCIM/Camera");
-
-    public void addCameraPhoto(File file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-        int width = options.outWidth;
-        int height = options.outHeight;
-
-        Photo photo = new Photo(
-                -1, new Date().getTime()
-                , CAMERA_FOLDER.hashCode()
-                , "Edited", file, width, height, "");
-
-        Uri uri = ImageUtils.saveImageToGallery(context.getContentResolver(), file);
-
-        long id = getIDImgFromURL(uri.toString());
-        photo.setIdImg(id);
-        photo.setPathUrl(uri.toString());
-        photo.setFile(file);
-
-        Album album = null;
-        for (Album album_ : listAlbum) {
-            if (album_.getFile().equals(CAMERA_FOLDER)) {
-                album = album_;
-                break;
-            }
-        }
-        boolean isHidden = false;
-        for (Album album_ : this.listHiddenAlbum) {
-            if (album_.getFile().equals(EDITED_FOLDER)) {
-                isHidden = true;
-                album = album_;
-                break;
-            }
-        }
-
-        album.addPhotoAtHead(photo);
-        if (!isHidden) {
-            listAlbum.add(album);
-            listPhoto.addFirst(photo);
-            convertListPhoto2ListPhotoSameDate(listPhoto);
-            setChanged();
-            notifyObservers();
-        }
-
+        file.delete();
     }
 
 }
